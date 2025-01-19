@@ -112,24 +112,24 @@ export const CourseList: React.FC = () => {
   
     // Tytuł certyfikatu
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(24);
+    doc.setFontSize(22);
     doc.text('Certyfikat Ukończenia Kursu', 148, 50, { align: 'center' });
   
     // Dane użytkownika
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.text(`Niniejszym zaświadcza się, że`, 148, 80, { align: 'center' });
     
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(20);
+    doc.setFontSize(18);
     doc.text(user.displayName, 148, 100, { align: 'center' });
   
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(16);
+    doc.setFontSize(15);
     doc.text(`pomyślnie ukończył kurs:`, 148, 120, { align: 'center' });
   
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
+    doc.setFontSize(16);
     doc.text(course.title, 148, 140, { align: 'center' });
   
     // Data
