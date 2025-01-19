@@ -14,6 +14,7 @@ import { PaymentForm } from './components/Payment/PaymentForm.tsx';
 import { PaymentSuccess } from './components/Payment/PaymentSuccess.tsx';
 import { Header } from './components/Layout/Header.tsx';
 import { CourseView } from './components/Courses/CourseView.tsx';
+import LandingPage from './components/LandingPage.tsx';
 
 const App: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ const App: React.FC = () => {
           <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <Routes>
               {/* Strona główna */}
-              <Route path="/" element={<Navigate to="/courses" replace />} />
+              <Route path="/" element={<LandingPage />} />
               
               {/* Publiczne ścieżki */}
               <Route path="/login" element={<Login />} />

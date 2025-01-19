@@ -1,12 +1,18 @@
-// src/components/Layout/Header.tsx
+// File: src/components/Layout/Header.tsx
 import React from 'react';
 import { useAuth } from '../Auth/AuthProvider.tsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { auth } from '../../firebase/config.ts';
 
 export const Header: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Don't show header on landing page
+  if (location.pathname === '/') {
+    return null;
+  }
 
   const handleLogout = async () => {
     try {
