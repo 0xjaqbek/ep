@@ -86,7 +86,7 @@ export const CourseList: React.FC = () => {
   }
 
   const generateCertificate = (course: Course, user: User) => {
-    const certificateNumber = `CERT-${user.uid}-${course.id}`;
+    const certificateNumber = `CERT-${course.id.substring(0,6)}-${Date.now()}`;
   
     const doc = new jsPDF({
       orientation: 'landscape',
