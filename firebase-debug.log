@@ -1,0 +1,132 @@
+[debug] [2025-01-19T16:57:06.207Z] ----------------------------------------------------------------------
+[debug] [2025-01-19T16:57:06.211Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Dell\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-01-19T16:57:06.211Z] CLI Version:   13.29.1
+[debug] [2025-01-19T16:57:06.211Z] Platform:      win32
+[debug] [2025-01-19T16:57:06.211Z] Node Version:  v20.12.0
+[debug] [2025-01-19T16:57:06.211Z] Time:          Sun Jan 19 2025 17:57:06 GMT+0100 (czas środkowoeuropejski standardowy)
+[debug] [2025-01-19T16:57:06.212Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-01-19T16:57:06.300Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-01-19T16:57:06.300Z] > authorizing via signed-in user (jaqbek.eth@gmail.com)
+[debug] [2025-01-19T16:57:06.301Z] [iam] checking project punkty999-31eff for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2025-01-19T16:57:06.302Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:06.303Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:06.304Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/punkty999-31eff:testIamPermissions [none]
+[debug] [2025-01-19T16:57:06.304Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/punkty999-31eff:testIamPermissions x-goog-quota-user=projects/punkty999-31eff
+[debug] [2025-01-19T16:57:06.304Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/punkty999-31eff:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-01-19T16:57:07.476Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/punkty999-31eff:testIamPermissions 200
+[debug] [2025-01-19T16:57:07.476Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/punkty999-31eff:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2025-01-19T16:57:07.477Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:07.477Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:07.477Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/punkty999-31eff [none]
+[debug] [2025-01-19T16:57:08.323Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/punkty999-31eff 200
+[debug] [2025-01-19T16:57:08.323Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/punkty999-31eff {"projectId":"punkty999-31eff","projectNumber":"583933881300","displayName":"punkty999","name":"projects/punkty999-31eff","resources":{"hostingSite":"punkty999-31eff"},"state":"ACTIVE","etag":"1_2287fcc4-d6be-4367-8596-58bfddd279fd"}
+[info] 
+[info] === Deploying to 'punkty999-31eff'...
+[info] 
+[info] i  deploying storage, firestore, hosting 
+[info] i  storage: ensuring required API firebasestorage.googleapis.com is enabled... 
+[debug] [2025-01-19T16:57:08.330Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:08.330Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:08.330Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/punkty999-31eff/services/firebasestorage.googleapis.com [none]
+[debug] [2025-01-19T16:57:08.330Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/punkty999-31eff/services/firebasestorage.googleapis.com x-goog-quota-user=projects/punkty999-31eff
+[debug] [2025-01-19T16:57:09.538Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/punkty999-31eff/services/firebasestorage.googleapis.com 200
+[debug] [2025-01-19T16:57:09.538Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/punkty999-31eff/services/firebasestorage.googleapis.com [omitted]
+[info] +  storage: required API firebasestorage.googleapis.com is enabled 
+[debug] [2025-01-19T16:57:09.539Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:09.539Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:09.539Z] >>> [apiv2][query] GET https://firebasestorage.googleapis.com/v1alpha/projects/punkty999-31eff/defaultBucket [none]
+[debug] [2025-01-19T16:57:10.168Z] <<< [apiv2][status] GET https://firebasestorage.googleapis.com/v1alpha/projects/punkty999-31eff/defaultBucket 200
+[debug] [2025-01-19T16:57:10.169Z] <<< [apiv2][body] GET https://firebasestorage.googleapis.com/v1alpha/projects/punkty999-31eff/defaultBucket {"name":"projects/punkty999-31eff/defaultBucket","location":"US-CENTRAL1","bucket":{"name":"projects/punkty999-31eff/buckets/punkty999-31eff.firebasestorage.app"},"storageClass":"REGIONAL"}
+[info] i  firebase.storage: checking storage.rules for compilation errors... 
+[debug] [2025-01-19T16:57:10.171Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:10.171Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:10.171Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test [none]
+[debug] [2025-01-19T16:57:10.171Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test [omitted]
+[debug] [2025-01-19T16:57:11.464Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test 200
+[debug] [2025-01-19T16:57:11.464Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test {}
+[info] +  firebase.storage: rules file storage.rules compiled successfully 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-01-19T16:57:11.468Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:11.468Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:11.468Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test [none]
+[debug] [2025-01-19T16:57:11.468Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test [omitted]
+[debug] [2025-01-19T16:57:12.178Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test 200
+[debug] [2025-01-19T16:57:12.178Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/punkty999-31eff:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-01-19T16:57:12.183Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:12.183Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:12.183Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/punkty999-31eff/versions [none]
+[debug] [2025-01-19T16:57:12.183Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/punkty999-31eff/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-01-19T16:57:13.671Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/punkty999-31eff/versions 200
+[debug] [2025-01-19T16:57:13.671Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/punkty999-31eff/versions {"name":"projects/583933881300/sites/punkty999-31eff/versions/41147e00206aff74","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-01-19T16:57:13.672Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:13.672Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:13.673Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases pageSize=10&pageToken=
+[debug] [2025-01-19T16:57:14.582Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases 200
+[debug] [2025-01-19T16:57:14.582Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases {"releases":[{"name":"projects/punkty999-31eff/releases/cloud.firestore","rulesetName":"projects/punkty999-31eff/rulesets/1c60307f-abdb-4128-9572-54beccf01175","createTime":"2025-01-19T08:21:35.019014Z","updateTime":"2025-01-19T16:54:02.837790Z"},{"name":"projects/punkty999-31eff/releases/firebase.storage/punkty999-31eff.firebasestorage.app","rulesetName":"projects/punkty999-31eff/rulesets/a413600c-92c4-481c-882c-6a6e4790f321","createTime":"2025-01-19T09:18:41.143870Z","updateTime":"2025-01-19T16:54:01.968501Z"}]}
+[debug] [2025-01-19T16:57:14.596Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:14.596Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:14.596Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/a413600c-92c4-481c-882c-6a6e4790f321 [none]
+[debug] [2025-01-19T16:57:14.878Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/a413600c-92c4-481c-882c-6a6e4790f321 200
+[debug] [2025-01-19T16:57:14.878Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/a413600c-92c4-481c-882c-6a6e4790f321 [omitted]
+[info] i  storage: latest version of storage.rules already up to date, skipping upload... 
+[debug] [2025-01-19T16:57:14.879Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:14.879Z] Checked if tokens are valid: true, expires at: 1737308128083
+[info] i  firestore: deploying indexes... 
+[debug] [2025-01-19T16:57:14.881Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:14.881Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:14.881Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases pageSize=10&pageToken=
+[debug] [2025-01-19T16:57:14.882Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/indexes [none]
+[debug] [2025-01-19T16:57:15.307Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/indexes 200
+[debug] [2025-01-19T16:57:15.308Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/indexes {}
+[debug] [2025-01-19T16:57:15.308Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:15.308Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:15.308Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* [none]
+[debug] [2025-01-19T16:57:15.423Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* 200
+[debug] [2025-01-19T16:57:15.423Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/punkty999-31eff/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* {"fields":[{"name":"projects/punkty999-31eff/databases/(default)/collectionGroups/__default__/fields/*","indexConfig":{"indexes":[{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"ASCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"DESCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","arrayConfig":"CONTAINS"}],"state":"READY"}]}}]}
+[info] +  firestore: deployed indexes in firestore.indexes.json successfully for (default) database 
+[debug] [2025-01-19T16:57:15.622Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases 200
+[debug] [2025-01-19T16:57:15.622Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/releases {"releases":[{"name":"projects/punkty999-31eff/releases/cloud.firestore","rulesetName":"projects/punkty999-31eff/rulesets/1c60307f-abdb-4128-9572-54beccf01175","createTime":"2025-01-19T08:21:35.019014Z","updateTime":"2025-01-19T16:54:02.837790Z"},{"name":"projects/punkty999-31eff/releases/firebase.storage/punkty999-31eff.firebasestorage.app","rulesetName":"projects/punkty999-31eff/rulesets/a413600c-92c4-481c-882c-6a6e4790f321","createTime":"2025-01-19T09:18:41.143870Z","updateTime":"2025-01-19T16:54:01.968501Z"}]}
+[debug] [2025-01-19T16:57:15.622Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:15.623Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:15.623Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/1c60307f-abdb-4128-9572-54beccf01175 [none]
+[debug] [2025-01-19T16:57:16.322Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/1c60307f-abdb-4128-9572-54beccf01175 200
+[debug] [2025-01-19T16:57:16.322Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/punkty999-31eff/rulesets/1c60307f-abdb-4128-9572-54beccf01175 [omitted]
+[info] i  firestore: latest version of firestore.rules already up to date, skipping upload... 
+[info] i  hosting[punkty999-31eff]: beginning deploy... 
+[info] i  hosting[punkty999-31eff]: found 22 files in build 
+[debug] [2025-01-19T16:57:16.341Z] [hosting] uploading with 200 concurrency
+[debug] [2025-01-19T16:57:17.024Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.024Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.025Z] [hosting] hash cache [YnVpbGQ] stored for 22 files
+[debug] [2025-01-19T16:57:17.025Z] [hosting][hash queue][FINAL] {"max":676,"min":3,"avg":59.90909090909091,"active":0,"complete":22,"success":22,"errored":0,"retried":0,"total":22,"elapsed":681}
+[debug] [2025-01-19T16:57:17.025Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/583933881300/sites/punkty999-31eff/versions/41147e00206aff74:populateFiles [none]
+[debug] [2025-01-19T16:57:17.025Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/583933881300/sites/punkty999-31eff/versions/41147e00206aff74:populateFiles {"files":{"/robots.txt":"bfe106a3fb878dc83461c86818bf74fc1bdc7f28538ba613cd3e775516ce8b49","/manifest.json":"ee04fb47e525c67d8424ffe9b4d8a8a24e434504478afca4e0ca602146836d4c","/logo512.png":"212b102aa09e51b3b3e06647e81f7801a61333e171f6582e8124379aabccb41d","/logo192.png":"79e2b749561016bc8af300ea19f48347ceed3cb1a54f48ae456172eca45e08f0","/favicon.ico":"27edce7be5922cf0bef7d4136f69b5bfbdd5bf8c13c7b026f71187d41a00aa7d","/404.html":"762bf484ba67404bd1a3b181546ea28d60dfddf18e9dd4795d8d25bcf3c1a890","/index.html":"19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c","/asset-manifest.json":"589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c","/static/js/main.947c62a5.js.LICENSE.txt":"25372c89c7ed353bb5d5fc21911bb74b71d59423cc244f56c4443adfa5da752f","/static/js/239.55e1cece.chunk.js.LICENSE.txt":"34d91dd0d6d9f3527133408f15dfc02a02d685ae5404131418862e772d3db0a8","/static/js/213.44dc7fbb.chunk.js.LICENSE.txt":"17097db81bd72f51bcc127ceb8c9af730baea0003df4988d2b79c6d253e29518","/static/css/main.222783f1.css.map":"94187d71a59e5ba0b7789f075a1632868f419dc6b8b5f4d19bde3f6222e4a67d","/static/js/213.44dc7fbb.chunk.js":"da2a5c6fb3028b9ecfeff5b845ccba780904cc9548061ef8427fa662bf2ec977","/static/css/main.222783f1.css":"59fcc20f9d8a2c521a8727bfb663d5c3c93b8915fb48ed76382af2a692b6df3f","/static/js/213.44dc7fbb.chunk.js.map":"e4cc4b9aa02931f2dc090f4676f0c7d9365c025613a5c872760cf3fbf9e980ca","/static/js/455.945d9770.chunk.js":"9d72e6465672b13d495d60e080608ca644e1eb7fddfe5d97a5fca267cedb7f16","/static/js/239.55e1cece.chunk.js":"adc6ffd5af212d50ce962b15a8dd091c8d4c108e0f723c00d858b92202a89304","/static/js/455.945d9770.chunk.js.map":"670b1e7454a357b5721fbdbcdca006942ef97227b667e2423202068907fd6de3","/static/media/logoEP.79f5a131abd4b445e546.png":"b1a3e1da8664b08860fc5d234e15e299eef51c1f5925ece730fd2cfcea049713","/static/js/239.55e1cece.chunk.js.map":"666f387e8d8759ea049e51b7c775f67d4ac07a055731140b06a3a767596e005f","/static/js/main.947c62a5.js":"28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358","/static/js/main.947c62a5.js.map":"9ea2c0682191e0c1a0610cb9bfeeb1e260db0a8d8f712d82e380de32f9b14605"}}
+[debug] [2025-01-19T16:57:17.360Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/583933881300/sites/punkty999-31eff/versions/41147e00206aff74:populateFiles 200
+[debug] [2025-01-19T16:57:17.360Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/583933881300/sites/punkty999-31eff/versions/41147e00206aff74:populateFiles {"uploadRequiredHashes":["589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c","9ea2c0682191e0c1a0610cb9bfeeb1e260db0a8d8f712d82e380de32f9b14605","19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c","28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files"}
+[debug] [2025-01-19T16:57:17.360Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.360Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] Checked if tokens are valid: true, expires at: 1737308128083
+[debug] [2025-01-19T16:57:17.361Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c [none]
+[debug] [2025-01-19T16:57:17.361Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c [stream]
+[debug] [2025-01-19T16:57:17.362Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/9ea2c0682191e0c1a0610cb9bfeeb1e260db0a8d8f712d82e380de32f9b14605 [none]
+[debug] [2025-01-19T16:57:17.362Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/9ea2c0682191e0c1a0610cb9bfeeb1e260db0a8d8f712d82e380de32f9b14605 [stream]
+[debug] [2025-01-19T16:57:17.364Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c [none]
+[debug] [2025-01-19T16:57:17.364Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c [stream]
+[debug] [2025-01-19T16:57:17.365Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358 [none]
+[debug] [2025-01-19T16:57:17.365Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358 [stream]
+[debug] [2025-01-19T16:57:17.366Z] [hosting][populate queue][FINAL] {"max":338,"min":338,"avg":338,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":343}
+[debug] [2025-01-19T16:57:17.366Z] [hosting] uploads queued: 4
+[debug] [2025-01-19T16:57:19.581Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c 200
+[debug] [2025-01-19T16:57:19.581Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/19c99115a355d9b9eb6091d94ae7572a825568846ffc0084084a84258d933e0c [stream]
+[debug] [2025-01-19T16:57:19.674Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c 200
+[debug] [2025-01-19T16:57:19.674Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/589ad8e133578eecdc51cddbad70dd15cb71ef8106dc8d38e1f99dfaaac46b2c [stream]
+[debug] [2025-01-19T16:57:20.667Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358 200
+[debug] [2025-01-19T16:57:20.667Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/punkty999-31eff/versions/41147e00206aff74/files/28ce157a52376c46eb73ac65f8444ae24a4502460f36b91627d950948ebf4358 [stream]
