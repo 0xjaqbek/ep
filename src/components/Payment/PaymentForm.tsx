@@ -36,6 +36,12 @@ export const PaymentForm: React.FC = () => {
     setError('');
 
     try {
+        if (!currentUser?.uid) {
+            setError('Nie można zidentyfikować użytkownika');
+            setLoading(false);
+            return;
+          }
+      
       const p24Service = new P24Service();
       const paymentData = {
         courseId: state.courseId,

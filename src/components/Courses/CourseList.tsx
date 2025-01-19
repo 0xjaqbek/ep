@@ -6,6 +6,7 @@ import { Course, User } from '../../types';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import logoImage from '../../assets/logoEP.png';
 
 export const CourseList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -85,6 +86,8 @@ export const CourseList: React.FC = () => {
   }
 
   const generateCertificate = (course: Course, user: User) => {
+    const certificateNumber = `CERT-${user.uid}-${course.id}`;
+  
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
@@ -99,6 +102,13 @@ export const CourseList: React.FC = () => {
     doc.setDrawColor(0);
     doc.setLineWidth(5);
     doc.rect(10, 10, 277, 190);
+  
+    // Dodaj logo (jeśli masz plik logo)
+    try {
+      doc.addImage(logoImage, 'PNG', 20, 15, 50, 50);
+    } catch (error) {
+      console.error('Nie można dodać logo:', error);
+    }
   
     // Tytuł certyfikatu
     doc.setFont('helvetica', 'bold');
@@ -126,7 +136,16 @@ export const CourseList: React.FC = () => {
     const today = new Date();
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
-    doc.text(`Data ukończenia: ${today.toLocaleDateString()}`, 148, 170, { align: 'center' });
+    doc.text(`Data ukończenia: ${today.toLocaleDateString()}`, 148, 160, { align: 'center' });
+  
+    // Numer certyfikatu
+    doc.text(`Numer certyfikatu: ${certificateNumber}`, 148, 170, { align: 'center' });
+  
+    // Podpisy
+    doc.setLineWidth(0.5);
+    doc.line(50, 190, 100, 190); // Linia pod podpisem
+    doc.line(200, 190, 250, 190); // Linia pod podpisem
+    doc.text('Dyrektor Platformy', 75, 200, { align: 'center' });
   
     // Zapis PDF
     doc.save(`Certyfikat_${course.title}_${today.toISOString().split('T')[0]}.pdf`);

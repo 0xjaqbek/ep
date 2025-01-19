@@ -1,6 +1,6 @@
 // File: src/types/index.ts
 export interface User {
-    uid: string;
+    uid?: string;
     email: string;
     displayName: string;
     role: 'student' | 'admin';
@@ -18,6 +18,7 @@ export interface User {
     };
     purchasedCourses: string[];
     completedCourses: string[];
+    createdAt?: Date;
   }
   
   export interface Course {
