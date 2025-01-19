@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
-import { Course } from '../../types';
+import { Course, User } from '../../types';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
+import jsPDF from 'jspdf';
 
 export const CourseList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -12,73 +13,68 @@ export const CourseList: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation(); 
-  
 
   useEffect(() => {
     const fetchCourses = async () => {
+      try {
+        const coursesSnapshot = await getDocs(collection(db, 'courses'));
+        const coursesData = coursesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Course[];
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('Błąd podczas pobierania kursów:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      const fetchCourses = async () => {
         try {
           const coursesSnapshot = await getDocs(collection(db, 'courses'));
           const coursesData = coursesSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-          })) as Course[];  // Usuwamy filtrowanie po isPublished
+          })) as Course[];
           setCourses(coursesData);
         } catch (error) {
           console.error('Błąd podczas pobierania kursów:', error);
-        } finally {
-          setLoading(false);
         }
       };
 
-    fetchCourses();
-  }, []);
+      fetchCourses();
+    }
+  }, [currentUser, location.pathname]);
 
-    // Nowy useEffect do odświeżania listy zakupionych kursów
-    useEffect(() => {
-      if (currentUser) {
-        // Odśwież listę kursów po zmianie currentUser lub lokalizacji
-        const fetchCourses = async () => {
-          try {
-            const coursesSnapshot = await getDocs(collection(db, 'courses'));
-            const coursesData = coursesSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            })) as Course[];
-            setCourses(coursesData);
-          } catch (error) {
-            console.error('Błąd podczas pobierania kursów:', error);
-          }
-        };
+  const handleCourseAction = async (course: Course) => {
+    if (!currentUser) {
+      navigate('/login', { 
+        state: { 
+          redirectAfterLogin: `/courses/${course.id}`,
+          message: 'Zaloguj się, aby kupić kurs' 
+        } 
+      });
+      return;
+    }
   
-        fetchCourses();
-      }
-    }, [currentUser, location.pathname]);
-
-    const handleCourseAction = async (course: Course) => {
-      if (!currentUser) {
-        navigate('/login', { 
-          state: { 
-            redirectAfterLogin: `/courses/${course.id}`,
-            message: 'Zaloguj się, aby kupić kurs' 
-          } 
-        });
-        return;
-      }
-    
-      if (currentUser.purchasedCourses?.includes(course.id)) {
-        // Sprawdź, czy ta linia się wykonuje przez dodanie console.log
-        console.log('Przekierowuję do kursu:', `/course/${course.id}/learn`);
-        navigate(`/course/${course.id}/learn`);
-      } else {
-        navigate(`/payment/checkout`, {
-          state: {
-            courseId: course.id,
-            courseTitle: course.title,
-            coursePrice: course.price
-          }
-        });
-      }
-    };
+    if (currentUser.purchasedCourses?.includes(course.id)) {
+      navigate(`/course/${course.id}/learn`);
+    } else {
+      navigate(`/payment/checkout`, {
+        state: {
+          courseId: course.id,
+          courseTitle: course.title,
+          coursePrice: course.price
+        }
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -87,6 +83,54 @@ export const CourseList: React.FC = () => {
       </div>
     );
   }
+
+  const generateCertificate = (course: Course, user: User) => {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+  
+    // Tło certyfikatu
+    doc.setFillColor(240, 240, 240);
+    doc.rect(0, 0, 297, 210, 'F');
+  
+    // Ramka
+    doc.setDrawColor(0);
+    doc.setLineWidth(5);
+    doc.rect(10, 10, 277, 190);
+  
+    // Tytuł certyfikatu
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.text('Certyfikat Ukończenia Kursu', 148, 50, { align: 'center' });
+  
+    // Dane użytkownika
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(16);
+    doc.text(`Niniejszym zaświadcza się, że`, 148, 80, { align: 'center' });
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text(user.displayName, 148, 100, { align: 'center' });
+  
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(16);
+    doc.text(`pomyślnie ukończył kurs:`, 148, 120, { align: 'center' });
+  
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text(course.title, 148, 140, { align: 'center' });
+  
+    // Data
+    const today = new Date();
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(`Data ukończenia: ${today.toLocaleDateString()}`, 148, 170, { align: 'center' });
+  
+    // Zapis PDF
+    doc.save(`Certyfikat_${course.title}_${today.toISOString().split('T')[0]}.pdf`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -125,18 +169,36 @@ export const CourseList: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t">
                     <span className="text-2xl font-bold text-blue-600">{course.price} PLN</span>
-                    <button 
-                      className={`px-6 py-2 rounded-lg text-white font-semibold ${
-                        currentUser?.purchasedCourses?.includes(course.id)
-                          ? 'bg-green-500 hover:bg-green-600'
-                          : 'bg-blue-500 hover:bg-blue-600'
-                      } transition-colors duration-200`}
-                      onClick={() => handleCourseAction(course)}
-                    >
-                      {currentUser?.purchasedCourses?.includes(course.id)
-                        ? 'Rozpocznij kurs'
-                        : 'Kup teraz'}
-                    </button>
+                    <div className="flex flex-col items-end">
+                      <button 
+                        className={`px-6 py-2 rounded-lg text-white font-semibold ${
+                          currentUser?.completedCourses?.includes(course.id)
+                            ? 'bg-green-500 cursor-default'
+                            : currentUser?.purchasedCourses?.includes(course.id)
+                              ? 'bg-blue-500 hover:bg-blue-600'
+                              : 'bg-blue-500 hover:bg-blue-600'
+                        } transition-colors duration-200`}
+                        onClick={() => handleCourseAction(course)}
+                        disabled={currentUser?.completedCourses?.includes(course.id)}
+                      >
+                        {currentUser?.completedCourses?.includes(course.id)
+                          ? 'Zaliczony'
+                          : currentUser?.purchasedCourses?.includes(course.id)
+                            ? 'Rozpocznij kurs'
+                            : 'Kup teraz'}
+                      </button>
+                      {currentUser?.completedCourses?.includes(course.id) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            generateCertificate(course, currentUser);
+                          }}
+                          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                          Pobierz certyfikat
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

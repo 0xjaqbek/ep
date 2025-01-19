@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from '../../firebase/config.ts';
+import { db, auth } from '../../firebase/config.ts';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 
 interface CourseTestProps {
@@ -51,30 +51,33 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, questions, onC
 
   const markCourseAsCompleted = async () => {
     try {
-      // Dodaj logi debugowania
-      console.log('Current User:', currentUser);
-      console.log('Course ID:', courseId);
+      // Dodaj szczegółowe logi debugowania
+      console.log('Dane CurrentUser:', currentUser);
+      console.log('Auth:', auth);
+      console.log('Zalogowany użytkownik w auth:', auth.currentUser);
+  
+      const userId = currentUser?.uid || auth.currentUser?.uid;
       
-      if (!currentUser?.uid) {
-        console.error('Brak ID użytkownika');
+      console.log('Znaleziony userId:', userId);
+  
+      if (!userId) {
+        console.error('Nie można znaleźć ID użytkownika');
         return;
       }
-
+  
       // Utwórz referencję do dokumentu użytkownika
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      console.log('User document reference created for:', currentUser.uid);
-
+      const userDocRef = doc(db, 'users', userId);
+  
       // Aktualizuj dokument
       await updateDoc(userDocRef, {
         completedCourses: arrayUnion(courseId)
       });
-
+  
       console.log('Kurs został oznaczony jako ukończony');
     } catch (error) {
       console.error('Pełny błąd:', error);
-      // Nie pokazuj błędu użytkownikowi - test został zaliczony
     }
-};
+  };
 
   if (showResults) {
     return (
