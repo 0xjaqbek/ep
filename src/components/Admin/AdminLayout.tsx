@@ -1,4 +1,4 @@
-// File: src/components/Admin/AdminLayout.tsx
+// src/components/Admin/AdminLayout.tsx
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 
@@ -29,6 +29,12 @@ export const AdminLayout: React.FC = () => {
             Zarządzanie kursami
           </Link>
           <Link
+            to="/admin/tests"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/tests')}`}
+          >
+            Zarządzanie testami
+          </Link>
+          <Link
             to="/admin/users"
             className={`block p-4 hover:bg-blue-700 ${isActive('/admin/users')}`}
           >
@@ -40,11 +46,25 @@ export const AdminLayout: React.FC = () => {
           >
             Płatności
           </Link>
+          <Link
+            to="/admin/certificates"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/certificates')}`}
+          >
+            Certyfikaty
+          </Link>
+          <Link
+            to="/admin/reports"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/reports')}`}
+          >
+            Raporty
+          </Link>
         </nav>
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <Outlet />
+        <div className="p-6">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

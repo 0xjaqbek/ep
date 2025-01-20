@@ -16,7 +16,11 @@ export const Register: React.FC = () => {
     street: '',
     city: '',
     postalCode: '',
-    country: 'Poland'
+    country: 'Poland',
+    nip: '',
+    additionalInfo: '',
+    gdprConsent: false,
+    marketingConsent: false
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,6 +30,12 @@ export const Register: React.FC = () => {
     setError('');
     setLoading(true);
 
+    if (!formData.gdprConsent) {
+      setError('Musisz wyrazić zgodę na przetwarzanie danych osobowych');
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Hasła nie są identyczne');
       setLoading(false);
@@ -33,14 +43,12 @@ export const Register: React.FC = () => {
     }
 
     try {
-      // Utwórz konto użytkownika w Authentication
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
 
-      // Dodaj dane użytkownika do Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,  
         email: formData.email,
@@ -53,6 +61,11 @@ export const Register: React.FC = () => {
           postalCode: formData.postalCode,
           country: formData.country
         },
+        nip: formData.nip || null,
+        additionalInfo: formData.additionalInfo || null,
+        marketingConsent: formData.marketingConsent,
+        gdprConsent: formData.gdprConsent,
+        gdprConsentDate: new Date(),
         purchasedCourses: [],
         completedCourses: [],
         createdAt: new Date()
@@ -77,10 +90,13 @@ export const Register: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -101,9 +117,10 @@ export const Register: React.FC = () => {
           )}
 
           <div className="rounded-md shadow-sm space-y-4">
+            {/* Istniejące pola formularza */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+                Email *
               </label>
               <input
                 id="email"
@@ -118,7 +135,7 @@ export const Register: React.FC = () => {
 
             <div>
               <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
-                Imię i nazwisko
+                Imię i nazwisko *
               </label>
               <input
                 id="displayName"
@@ -133,7 +150,7 @@ export const Register: React.FC = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Hasło
+                Hasło *
               </label>
               <input
                 id="password"
@@ -148,7 +165,7 @@ export const Register: React.FC = () => {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Potwierdź hasło
+                Potwierdź hasło *
               </label>
               <input
                 id="confirmPassword"
@@ -163,12 +180,13 @@ export const Register: React.FC = () => {
 
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                Numer telefonu
+                Numer telefonu *
               </label>
               <input
                 id="phoneNumber"
                 name="phoneNumber"
                 type="tel"
+                required
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -176,13 +194,28 @@ export const Register: React.FC = () => {
             </div>
 
             <div>
+              <label htmlFor="nip" className="block text-sm font-medium text-gray-700">
+                NIP (opcjonalnie)
+              </label>
+              <input
+                id="nip"
+                name="nip"
+                type="text"
+                value={formData.nip}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
               <label htmlFor="street" className="block text-sm font-medium text-gray-700">
-                Ulica i numer
+                Ulica i numer *
               </label>
               <input
                 id="street"
                 name="street"
                 type="text"
+                required
                 value={formData.street}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -192,12 +225,13 @@ export const Register: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-                  Kod pocztowy
+                  Kod pocztowy *
                 </label>
                 <input
                   id="postalCode"
                   name="postalCode"
                   type="text"
+                  required
                   value={formData.postalCode}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -206,16 +240,80 @@ export const Register: React.FC = () => {
 
               <div>
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                  Miasto
+                  Miasto *
                 </label>
                 <input
                   id="city"
                   name="city"
                   type="text"
+                  required
                   value={formData.city}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700">
+                Dodatkowe informacje (opcjonalnie)
+              </label>
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleChange}
+                rows={3}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Zgody RODO */}
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="gdprConsent"
+                    name="gdprConsent"
+                    type="checkbox"
+                    required
+                    checked={formData.gdprConsent}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="gdprConsent" className="font-medium text-gray-700">
+                    Wyrażam zgodę na przetwarzanie moich danych osobowych *
+                  </label>
+                  <p className="text-gray-500">
+                    Zgodnie z art. 13 ust. 1 i 2 RODO informujemy, że administratorem Twoich danych osobowych jest nasza firma. 
+                    Dane będą przetwarzane w celu realizacji usług edukacyjnych. Masz prawo dostępu do swoich danych, ich sprostowania, 
+                    usunięcia lub ograniczenia przetwarzania. Więcej informacji znajdziesz w naszej Polityce Prywatności.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="marketingConsent"
+                    name="marketingConsent"
+                    type="checkbox"
+                    checked={formData.marketingConsent}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="marketingConsent" className="font-medium text-gray-700">
+                    Wyrażam zgodę na otrzymywanie informacji marketingowych
+                  </label>
+                  <p className="text-gray-500">
+                    Możesz otrzymywać od nas informacje o nowych kursach, promocjach i wydarzeniach. 
+                    Zgodę możesz wycofać w każdym czasie.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

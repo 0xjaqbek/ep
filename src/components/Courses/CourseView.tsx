@@ -7,10 +7,7 @@ import { CourseTest } from './CourseTest.tsx';
 import { Course } from '../../types';
 
 export const CourseView: React.FC = () => {
-    const params = useParams();
-    console.log('Params:', params);
-    const { id } = params;
-    console.log('CourseView renderowany z id:', id);
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [course, setCourse] = useState<Course | null>(null);
@@ -29,7 +26,7 @@ export const CourseView: React.FC = () => {
             setError('Kurs nie istnieje');
             return;
           }
-  
+    
           const courseData = { id: courseDoc.id, ...courseDoc.data() } as Course;
           setCourse(courseData);
         } catch (error) {
@@ -39,10 +36,10 @@ export const CourseView: React.FC = () => {
           setLoading(false);
         }
       };
-  
+    
       fetchCourse();
     }, [id]);
-  
+    
     useEffect(() => {
       if (!loading && currentUser && course) {
         if (!currentUser.purchasedCourses?.includes(course.id)) {
@@ -51,6 +48,10 @@ export const CourseView: React.FC = () => {
       }
     }, [loading, currentUser, course, navigate]);
   
+    const handleTestClose = () => {
+      setShowTest(false);
+    };
+    
     if (loading) {
       return (
         <div className="flex justify-center items-center min-h-screen">
@@ -58,7 +59,7 @@ export const CourseView: React.FC = () => {
         </div>
       );
     }
-  
+    
     if (error || !course) {
       return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -72,7 +73,7 @@ export const CourseView: React.FC = () => {
         </div>
       );
     }
-  
+    
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">{course.title}</h1>
@@ -90,28 +91,29 @@ export const CourseView: React.FC = () => {
             <p className="text-gray-600">Film zostanie dodany wkrótce</p>
           </div>
         )}
-  
+    
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Opis kursu</h2>
           <p className="text-gray-700 mb-6">{course.description}</p>
-  
+    
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-2">Szczegóły:</h3>
             <p className="text-gray-600">Czas trwania: {course.duration} minut</p>
           </div>
-  
+    
           {course.testQuestions && course.testQuestions.length > 0 && (
             <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4">Test sprawdzający</h2>
               {showTest ? (
                 <CourseTest
                   courseId={course.id}
+                  courseName={course.title}
                   questions={course.testQuestions}
-                  onClose={() => setShowTest(false)}
+                  onClose={handleTestClose}
                 />
               ) : (
                 <button
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
                   onClick={() => setShowTest(true)}
                 >
                   Rozpocznij test

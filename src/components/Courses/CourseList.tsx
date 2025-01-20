@@ -1,57 +1,41 @@
 // src/components/Courses/CourseList.tsx
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, arrayUnion, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
-import { Course, User } from '../../types';
+import { Course, CompletedCourse, User } from '../../types';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import logoImage from '../../assets/logoEP.png';
 
 export const CourseList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const coursesSnapshot = await getDocs(collection(db, 'courses'));
-        const coursesData = coursesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Course[];
-        setCourses(coursesData);
-      } catch (error) {
-        console.error('Błąd podczas pobierania kursów:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      const fetchCourses = async () => {
-        try {
-          const coursesSnapshot = await getDocs(collection(db, 'courses'));
-          const coursesData = coursesSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as Course[];
-          setCourses(coursesData);
-        } catch (error) {
-          console.error('Błąd podczas pobierania kursów:', error);
-        }
-      };
-
-      fetchCourses();
+  const fetchCourses = async () => {
+    try {
+      const coursesRef = collection(db, 'courses');
+      const coursesSnapshot = await getDocs(coursesRef);
+      const coursesData = coursesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Course[];
+      setCourses(coursesData);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      setError('Wystąpił błąd podczas ładowania kursów');
+    } finally {
+      setLoading(false);
     }
-  }, [currentUser, location.pathname]);
+  };
 
   const handleCourseAction = async (course: Course) => {
     if (!currentUser) {
@@ -63,7 +47,7 @@ export const CourseList: React.FC = () => {
       });
       return;
     }
-  
+
     if (currentUser.purchasedCourses?.includes(course.id)) {
       navigate(`/course/${course.id}/learn`);
     } else {
@@ -77,6 +61,91 @@ export const CourseList: React.FC = () => {
     }
   };
 
+  const generateCertificate = async (course: Course, user: User) => {
+    try {
+      const certificateNumber = `CERT-${course.id.substring(0,6)}-${Date.now()}`;
+      // Rename the PDF instance to 'pdfDoc' instead of 'doc'
+      const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
+  
+      // Update all references to use pdfDoc instead of doc
+      pdfDoc.setFillColor(240, 240, 240);
+      pdfDoc.rect(0, 0, 297, 210, 'F');
+      pdfDoc.setDrawColor(0);
+      pdfDoc.setLineWidth(5);
+      pdfDoc.rect(10, 10, 277, 190);
+  
+      try {
+        pdfDoc.addImage(logoImage, 'PNG', 20, 15, 50, 50);
+      } catch (error) {
+        console.warn('Error adding logo:', error);
+      }
+  
+      pdfDoc.setFont('helvetica', 'bold');
+      pdfDoc.setFontSize(22);
+      pdfDoc.text('Certyfikat Ukończenia Kursu', 148, 50, { align: 'center' });
+  
+      pdfDoc.setFont('helvetica', 'normal');
+      pdfDoc.setFontSize(14);
+      pdfDoc.text('Niniejszym zaświadcza się, że', 148, 80, { align: 'center' });
+  
+      pdfDoc.setFont('helvetica', 'bold');
+      pdfDoc.setFontSize(18);
+      pdfDoc.text(user.displayName, 148, 100, { align: 'center' });
+  
+      pdfDoc.setFont('helvetica', 'normal');
+      pdfDoc.setFontSize(15);
+      pdfDoc.text('pomyślnie ukończył kurs:', 148, 120, { align: 'center' });
+  
+      pdfDoc.setFont('helvetica', 'bold');
+      pdfDoc.setFontSize(16);
+      pdfDoc.text(course.title, 148, 140, { align: 'center' });
+  
+      const today = new Date();
+      pdfDoc.setFont('helvetica', 'normal');
+      pdfDoc.setFontSize(12);
+      pdfDoc.text(`Data ukończenia: ${today.toLocaleDateString()}`, 148, 160, { align: 'center' });
+      pdfDoc.text(`Numer certyfikatu: ${certificateNumber}`, 148, 170, { align: 'center' });
+  
+      pdfDoc.setDrawColor(100);
+      pdfDoc.setLineWidth(0.5);
+      pdfDoc.line(50, 180, 120, 180);
+      pdfDoc.line(177, 180, 247, 180);
+      pdfDoc.setFontSize(10);
+      pdfDoc.text('Podpis Instruktora', 85, 185, { align: 'center' });
+      pdfDoc.text('Dyrektor Platformy', 212, 185, { align: 'center' });
+  
+      const pdfOutput = pdfDoc.output('datauristring');
+        
+      if (user.uid) {
+        // Here we use the Firestore doc function
+        const userRef = doc(db, 'users', user.uid);
+          
+        const timestamp = Timestamp.fromDate(today);
+          
+        const completedCourse = {
+          courseId: course.id,
+          completedAt: timestamp,
+          certificateNumber,
+          certificatePdfUrl: pdfOutput,
+          score: 100
+        };
+        
+        try {
+          await updateDoc(userRef, {
+            completedCourses: arrayUnion(completedCourse)
+          });
+        } catch (error) {
+          console.error('Error updating user document:', error);
+          throw new Error('Failed to update completion status');
+        }
+      }
+  
+      pdfDoc.save(`Certyfikat_${course.title}_${today.toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error generating certificate:', error);
+      setError('Wystąpił błąd podczas generowania certyfikatu');
+    }
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -85,71 +154,19 @@ export const CourseList: React.FC = () => {
     );
   }
 
-  const generateCertificate = (course: Course, user: User) => {
-    const certificateNumber = `CERT-${course.id.substring(0,6)}-${Date.now()}`;
-  
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    });
-  
-    // Tło certyfikatu
-    doc.setFillColor(240, 240, 240);
-    doc.rect(0, 0, 297, 210, 'F');
-  
-    // Ramka
-    doc.setDrawColor(0);
-    doc.setLineWidth(5);
-    doc.rect(10, 10, 277, 190);
-  
-    // Dodaj logo (jeśli masz plik logo)
-    try {
-      doc.addImage(logoImage, 'PNG', 20, 15, 50, 50);
-    } catch (error) {
-      console.error('Nie można dodać logo:', error);
-    }
-  
-    // Tytuł certyfikatu
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.text('Certyfikat Ukończenia Kursu', 148, 50, { align: 'center' });
-  
-    // Dane użytkownika
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(14);
-    doc.text(`Niniejszym zaświadcza się, że`, 148, 80, { align: 'center' });
-    
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text(user.displayName, 148, 100, { align: 'center' });
-  
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(15);
-    doc.text(`pomyślnie ukończył kurs:`, 148, 120, { align: 'center' });
-  
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.text(course.title, 148, 140, { align: 'center' });
-  
-    // Data
-    const today = new Date();
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
-    doc.text(`Data ukończenia: ${today.toLocaleDateString()}`, 148, 160, { align: 'center' });
-  
-    // Numer certyfikatu
-    doc.text(`Numer certyfikatu: ${certificateNumber}`, 148, 170, { align: 'center' });
-  
-    // Podpisy
-    doc.setLineWidth(0.5);
-    doc.line(50, 190, 100, 190); // Linia pod podpisem
-    doc.line(200, 190, 250, 190); // Linia pod podpisem
-    doc.text('Dyrektor Platformy', 75, 200, { align: 'center' });
-  
-    // Zapis PDF
-    doc.save(`Certyfikat_${course.title}_${today.toISOString().split('T')[0]}.pdf`);
-  };
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-red-600 mb-4">{error}</p>
+        <button 
+          onClick={() => fetchCourses()}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Spróbuj ponownie
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -179,11 +196,7 @@ export const CourseList: React.FC = () => {
                 <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
                 <div className="space-y-2">
                   <div className="flex items-center text-sm text-gray-500">
-                    <span className="mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
-                      </svg>
-                    </span>
+                    <span className="mr-2">⏱</span>
                     <span>Czas trwania: {course.duration} min</span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t">
@@ -191,28 +204,30 @@ export const CourseList: React.FC = () => {
                     <div className="flex flex-col items-end">
                       <button 
                         className={`px-6 py-2 rounded-lg text-white font-semibold ${
-                          currentUser?.completedCourses?.includes(course.id)
+                          currentUser?.completedCourses?.some(cc => cc.courseId === course.id)
                             ? 'bg-green-500 cursor-default'
                             : currentUser?.purchasedCourses?.includes(course.id)
                               ? 'bg-blue-500 hover:bg-blue-600'
                               : 'bg-blue-500 hover:bg-blue-600'
                         } transition-colors duration-200`}
                         onClick={() => handleCourseAction(course)}
-                        disabled={currentUser?.completedCourses?.includes(course.id)}
+                        disabled={currentUser?.completedCourses?.some(cc => cc.courseId === course.id)}
                       >
-                        {currentUser?.completedCourses?.includes(course.id)
+                        {currentUser?.completedCourses?.some(cc => cc.courseId === course.id)
                           ? 'Zaliczony'
                           : currentUser?.purchasedCourses?.includes(course.id)
                             ? 'Rozpocznij kurs'
                             : 'Kup teraz'}
                       </button>
-                      {currentUser?.completedCourses?.includes(course.id) && (
+                      {currentUser?.completedCourses?.some(cc => cc.courseId === course.id) && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            generateCertificate(course, currentUser);
+                            if (currentUser) {
+                              generateCertificate(course, currentUser);
+                            }
                           }}
-                          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
                         >
                           Pobierz certyfikat
                         </button>

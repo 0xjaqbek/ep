@@ -3,7 +3,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider } from './components/Auth/AuthProvider.tsx';
 import { AdminLayout } from './components/Admin/AdminLayout.tsx';
-import { DashboardStats } from './components/Admin/DashboardStats.tsx';
+import { AnalyticsDashboard } from './components/Admin/AnalyticsDashboard.tsx';
+import { PaymentManagement } from './components/Admin/PaymentManagement.tsx';
+import { CertificateManagement } from './components/Admin/CertificateManagement.tsx';
+import { TestManagement } from './components/Admin/TestManagement.tsx';
 import { CourseManagement } from './components/Admin/CourseManagement.tsx';
 import { UserManagement } from './components/Admin/UserManagement.tsx';
 import { PaymentCallback } from './components/Payment/PaymentCallback.tsx';
@@ -15,6 +18,7 @@ import { PaymentSuccess } from './components/Payment/PaymentSuccess.tsx';
 import { Header } from './components/Layout/Header.tsx';
 import { CourseView } from './components/Courses/CourseView.tsx';
 import LandingPage from './components/LandingPage.tsx';
+import CookieConsent from './components/Common/CookieConsent.tsx';
 
 const App: React.FC = () => {
   return (
@@ -39,11 +43,15 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
               
               {/* Ścieżki admina */}
+    
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="dashboard" element={<DashboardStats />} />
+                <Route path="dashboard" element={<AnalyticsDashboard />} />
                 <Route path="courses" element={<CourseManagement />} />
+                <Route path="tests" element={<TestManagement />} />
                 <Route path="users" element={<UserManagement />} />
+                <Route path="payments" element={<PaymentManagement />} />
+                <Route path="certificates" element={<CertificateManagement />} />
               </Route>
 
               {/* Obsługa 404 */}
@@ -60,6 +68,7 @@ const App: React.FC = () => {
               } />
             </Routes>
           </main>
+          <CookieConsent />
         </div>
       </AuthProvider>
     </Router>
