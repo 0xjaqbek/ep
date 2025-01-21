@@ -1,17 +1,43 @@
-// src/components/LandingPage.tsx
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logoEP from '../../src/assets/logoEP.png';
-import ambu1 from '../../src/assets/ambu1.jpg';
-import ambu2 from '../../src/assets/ambu2.jpg';
-import ambu3 from '../../src/assets/ambu3.jpg';
-import ambu4 from '../../src/assets/ambu4.jpg';
-import ambu5 from '../../src/assets/ambu5.jpg';
+import logoEP from '../assets/logoEP.png';
+import ambu1 from '../assets/ambu1.jpg';
+import ambu2 from '../assets/ambu2.jpg';
+import ambu3 from '../assets/ambu3.jpg';
+import ambu4 from '../assets/ambu4.jpg';
+import ambu5 from '../assets/ambu5.jpg';
 
 const backgroundImages = [ambu1, ambu2, ambu3, ambu4, ambu5];
 
+const preloadImages = (images: string[]) => {
+  return Promise.all(
+    images.map((src) => {
+      return new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve();
+        img.onerror = () => reject();
+      });
+    })
+  );
+};
+
 const LandingPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    // Preload all background images and the logo
+    preloadImages([logoEP, ...backgroundImages])
+      .then(() => {
+        console.log('Images preloaded successfully!');
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error preloading images:', error);
+        setIsLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -20,6 +46,15 @@ const LandingPage: React.FC = () => {
 
     return () => clearInterval(timer);
   }, []);
+
+  if (isLoading) {
+    // Display a loading spinner or skeleton while preloading images
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-black text-white">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-black">
@@ -35,16 +70,16 @@ const LandingPage: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center pt-8 px-4">
         <div className="max-w-3xl text-center space-y-4 bg-black/20 p-8 rounded-lg backdrop-blur-sm">
-          <img 
+          <img
             src={logoEP}
-            alt="EP Logo" 
+            alt="EP Logo"
             className="w-64 h-auto mx-auto mb-2 drop-shadow-lg"
           />
-          
+
           <h1 className="text-3xl font-bold text-white mb-4 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
             Platforma Edukacyjna dla Ratowników Medycznych
           </h1>
-          
+
           <div className="space-y-4 text-lg text-white">
             <p className="leading-relaxed drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
               Witamy na platformie edukacyjnej dedykowanej ratownikom medycznym, 
