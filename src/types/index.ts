@@ -1,12 +1,9 @@
 // File: src/types/index.ts
-
+import { Timestamp } from 'firebase/firestore';
 // CompletedCourse interface for use in User interface
 export interface CompletedCourse {
   courseId: string;
-  completedAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  completedAt: Timestamp;  // Changed from Date to Timestamp
   certificateNumber: string;
   certificatePdfUrl: string;
   score: number;
@@ -56,12 +53,10 @@ export interface TestQuestion {
 }
 
 export interface Certificate {
-  id: string;
-  courseId: string;
   userId: string;
+  courseId: string;
   certificateNumber: string;
-  completionDate: Date;
-  score: number;
+  createdAt: Timestamp;
   pdfUrl: string;
-  status: 'active' | 'revoked' | 'replaced';
+  status: 'active' | 'revoked';
 }

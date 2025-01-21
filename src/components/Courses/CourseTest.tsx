@@ -1,13 +1,14 @@
 // src/components/Courses/CourseTest.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  doc, 
+  doc as firestoreDoc,   
   updateDoc, 
   arrayUnion, 
   addDoc, 
   collection,
-  getFirestore 
+  getFirestore,
+  Timestamp
 } from 'firebase/firestore';
 import { 
   getStorage,
@@ -17,9 +18,9 @@ import {
 } from 'firebase/storage';
 import { getApp } from 'firebase/app';
 import { useAuth } from '../Auth/AuthProvider.tsx';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
+import { generateAndDownloadPDF, CertificateData } from '../../utils/certificateUtils.tsx'; // adjust path as needed
 
-// Initialize Firebase services
 const db = getFirestore(getApp());
 const storage = getStorage(getApp());
 
@@ -45,6 +46,17 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login', {
+        state: {
+          redirectAfterLogin: `/course/${courseId}/learn`,
+          message: 'Zaloguj się, aby kontynuować kurs'
+        }
+      });
+    }
+  }, [currentUser, courseId, navigate]);
+
   const generateCertificateNumber = () => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
@@ -52,56 +64,46 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
   };
 
   const generateCertificatePDF = async (certificateNumber: string, score: number): Promise<string> => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: 'a4'
-    });
+    const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
 
-    // Add certificate styling
-    doc.setFillColor(240, 240, 240);
-    doc.rect(0, 0, 297, 210, 'F');
-    doc.setDrawColor(0);
-    doc.setLineWidth(5);
-    doc.rect(10, 10, 277, 190);
+    pdfDoc.setFillColor(240, 240, 240);
+    pdfDoc.rect(0, 0, 297, 210, 'F');
+    pdfDoc.setDrawColor(0);
+    pdfDoc.setLineWidth(5);
+    pdfDoc.rect(10, 10, 277, 190);
 
-    // Add title
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(30);
-    doc.text('Certyfikat Ukończenia', 148.5, 40, { align: 'center' });
+    pdfDoc.setFont('helvetica', 'bold');
+    pdfDoc.setFontSize(30);
+    pdfDoc.text('Certyfikat Ukończenia', 148.5, 40, { align: 'center' });
 
-    // Add course name
-    doc.setFontSize(20);
-    doc.text(`${courseName}`, 148.5, 60, { align: 'center' });
+    pdfDoc.setFontSize(20);
+    pdfDoc.text(`${courseName}`, 148.5, 60, { align: 'center' });
 
-    // Add user info
-    doc.setFontSize(16);
-    doc.text('Certyfikat wystawiony dla:', 148.5, 80, { align: 'center' });
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${currentUser?.displayName}`, 148.5, 90, { align: 'center' });
+    pdfDoc.setFontSize(16);
+    pdfDoc.text('Certyfikat wystawiony dla:', 148.5, 80, { align: 'center' });
+    pdfDoc.setFont('helvetica', 'bold');
+    if (currentUser?.displayName) {
+      pdfDoc.text(currentUser.displayName, 148.5, 90, { align: 'center' });
+    }
 
-    // Add score
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(14);
-    doc.text(`Wynik testu: ${score}%`, 148.5, 110, { align: 'center' });
+    pdfDoc.setFont('helvetica', 'normal');
+    pdfDoc.setFontSize(14);
+    pdfDoc.text(`Wynik testu: ${score}%`, 148.5, 110, { align: 'center' });
 
-    // Add certificate number and date
-    doc.setFontSize(12);
-    doc.text(`Numer certyfikatu: ${certificateNumber}`, 148.5, 130, { align: 'center' });
-    doc.text(`Data wystawienia: ${new Date().toLocaleDateString()}`, 148.5, 140, { align: 'center' });
+    pdfDoc.setFontSize(12);
+    pdfDoc.text(`Numer certyfikatu: ${certificateNumber}`, 148.5, 130, { align: 'center' });
+    pdfDoc.text(`Data wystawienia: ${new Date().toLocaleDateString()}`, 148.5, 140, { align: 'center' });
 
-    // Add signature lines
-    doc.setDrawColor(100);
-    doc.setLineWidth(0.5);
-    doc.line(50, 170, 120, 170);
-    doc.line(177, 170, 247, 170);
+    pdfDoc.setDrawColor(100);
+    pdfDoc.setLineWidth(0.5);
+    pdfDoc.line(50, 170, 120, 170);
+    pdfDoc.line(177, 170, 247, 170);
 
-    doc.setFontSize(10);
-    doc.text('Podpis Instruktora', 85, 180, { align: 'center' });
-    doc.text('Dyrektor Platformy', 212, 180, { align: 'center' });
+    pdfDoc.setFontSize(10);
+    pdfDoc.text('Podpis Instruktora', 85, 180, { align: 'center' });
+    pdfDoc.text('Dyrektor Platformy', 212, 180, { align: 'center' });
 
-    // Convert to base64
-    return doc.output('datauristring');
+    return pdfDoc.output('datauristring');
   };
 
   const handleAnswer = async (answerIndex: number) => {
@@ -133,46 +135,57 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
     setLoading(true);
     setError(null);
 
-    try {
-      if (!currentUser?.uid) {
-        throw new Error('Nie znaleziono użytkownika');
-      }
+    if (!currentUser?.uid) {
+      setError('Musisz być zalogowany, aby zapisać postęp kursu.');
+      setLoading(false);
+      return;
+    }
 
+    // Now TypeScript knows currentUser.uid is definitely not undefined
+    const userId = currentUser.uid;
+
+    try {
       const certificateNumber = generateCertificateNumber();
       const pdfData = await generateCertificatePDF(certificateNumber, finalScore);
 
       // Upload PDF to Storage
-      const pdfRef = ref(storage, `certificates/${currentUser.uid}/${certificateNumber}.pdf`);
+      const pdfRef = ref(storage, `certificates/${userId}/${certificateNumber}.pdf`);
       await uploadString(pdfRef, pdfData, 'data_url');
       const pdfUrl = await getDownloadURL(pdfRef);
 
-      // Add certificate to 'certificates' collection
+      const now = Timestamp.now();
+
+      // First, create the certificate
       await addDoc(collection(db, 'certificates'), {
         courseId,
-        userId: currentUser.uid,
+        userId: currentUser.uid, // Explicitly set user ID
+        userName: currentUser.displayName,
         certificateNumber,
-        completionDate: new Date(),
+        completionDate: now,
         score: finalScore,
         pdfUrl,
         status: 'active'
       });
 
-      // Update user document
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
-        completedCourses: arrayUnion({
-            courseId: courseId,
-          completedAt: new Date(),
-          certificateNumber,
-          certificatePdfUrl: pdfUrl,
-          score: finalScore
-        })
+      // Then update the user's document with ONLY the completedCourses field
+      const userDocRef = firestoreDoc(db, 'users', userId);  // Using the safely typed userId
+      const completedCourse = {
+        courseId,
+        completedAt: now,
+        certificateNumber,
+        certificatePdfUrl: pdfUrl,
+        score: finalScore
+      };
+
+      await updateDoc(userDocRef, {
+        completedCourses: arrayUnion(completedCourse)
       });
 
       console.log('Course completion handled successfully');
     } catch (error) {
       console.error('Error handling course completion:', error);
       setError('Wystąpił błąd podczas generowania certyfikatu. Spróbuj ponownie później.');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -196,21 +209,57 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
                 </p>
               )}
               {error && (
-                <p className="text-red-600 text-sm mt-2">
-                  {error}
-                </p>
+                <div className="mt-2 p-2 bg-red-100 text-red-700 rounded">
+                  <p>{error}</p>
+                  {!currentUser && (
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="mt-2 text-sm underline hover:no-underline"
+                    >
+                      Zaloguj się
+                    </button>
+                  )}
+                </div>
               )}
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-3">
+              {/* First button - Download Certificate */}
+              {currentUser?.completedCourses?.some(cc => cc.courseId === courseId) && (
+                <button
+                  onClick={() => {
+                    const completedCourse = currentUser.completedCourses.find(
+                      cc => cc.courseId === courseId
+                    );
+                    if (completedCourse) {
+                      generateAndDownloadPDF({
+                        userName: currentUser.displayName,
+                        courseName: courseName,
+                        certificateNumber: completedCourse.certificateNumber,
+                        completionDate: completedCourse.completedAt.toDate()
+                      });
+                    }
+                  }}
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+                  disabled={loading}
+                >
+                  Pobierz certyfikat
+                </button>
+              )}
+
+              {/* Second button - Return to course */}
               <button
                 onClick={onClose}
-                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+                className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
+                disabled={loading}
               >
                 Wróć do kursu
               </button>
+
+              {/* Third button - Course list */}
               <button
                 onClick={() => navigate('/courses')}
                 className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
+                disabled={loading}
               >
                 Lista kursów
               </button>
@@ -277,3 +326,5 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
     </div>
   );
 };
+
+export default CourseTest;
