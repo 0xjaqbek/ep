@@ -1,4 +1,4 @@
-// File: src/services/payment/p24Service.ts
+// src/services/payment/p24Service.ts
 import axios from 'axios';
 
 const WOOCOMMERCE_API_URL = process.env.REACT_APP_WOOCOMMERCE_API_URL;
@@ -7,6 +7,7 @@ const WC_CONSUMER_SECRET = process.env.REACT_APP_WC_CONSUMER_SECRET;
 
 export interface P24PaymentData {
   courseId: string;
+  courseTitle: string;  // Added this field
   userId: string;
   amount: number;
   email: string;
@@ -50,7 +51,7 @@ export class P24Service {
         },
         line_items: [
           {
-            name: `Kurs ID: ${paymentData.courseId}`,
+            name: `Kurs: ${paymentData.courseTitle}`,
             price: paymentData.amount,
             quantity: 1
           }
@@ -59,6 +60,10 @@ export class P24Service {
           {
             key: 'courseId',
             value: paymentData.courseId
+          },
+          {
+            key: 'courseTitle',
+            value: paymentData.courseTitle
           },
           {
             key: 'userId',

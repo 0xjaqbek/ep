@@ -8,8 +8,6 @@ import { P24Service } from '../../services/payment/p24Service.ts';
 export const PaymentCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
-  // Memoizacja instancji P24Service
   const p24Service = useMemo(() => new P24Service(), []);
 
   const verifyPayment = useCallback(async () => {
@@ -35,13 +33,20 @@ export const PaymentCallback: React.FC = () => {
 
         const courseId = orderData.meta_data.find((m: any) => m.key === 'courseId')?.value;
         const userId = orderData.meta_data.find((m: any) => m.key === 'userId')?.value;
+        const courseTitle = orderData.meta_data.find((m: any) => m.key === 'courseTitle')?.value;
 
         if (courseId && userId) {
           await updateDoc(doc(db, 'users', userId), {
             purchasedCourses: arrayUnion(courseId)
           });
 
-          navigate('/payment-success');
+          // Navigate to payment success with course info
+          navigate('/payment/success', {
+            state: {
+              courseId,
+              courseTitle
+            }
+          });
         } else {
           throw new Error('Brak danych kursu lub użytkownika');
         }

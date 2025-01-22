@@ -50,7 +50,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
       
       const paymentData = {
         courseId: course.id,
-        userId: user.id,
+        courseTitle: course.title,  // Add course title here
+        userId: user.uid,           // Changed from user.id to user.uid to match User interface
         amount: course.price,
         email: values.email,
         customerData: {
