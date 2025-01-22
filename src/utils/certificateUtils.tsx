@@ -1,3 +1,4 @@
+// src/utils/certificateUtils.tsx
 import { jsPDF } from 'jspdf';
 import logoImage from '../assets/logoEP.png';
 
@@ -7,6 +8,20 @@ export interface CertificateData {
   certificateNumber: string;
   completionDate: Date;
 }
+
+export const generateCertificateNumber = (courseId: string, userId: string) => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  
+  const dateStr = `${year}${month}${day}-${hours}${minutes}`;
+  const userPrefix = userId.substring(0, 3);
+  
+  return `CERT-${courseId.substring(0, 4)}-${dateStr}-${userPrefix}`;
+};
 
 export const generateAndDownloadPDF = (data: CertificateData) => {
   const pdfDoc = new jsPDF('landscape', 'mm', 'a4');

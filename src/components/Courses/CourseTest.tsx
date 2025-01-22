@@ -19,7 +19,7 @@ import {
 import { getApp } from 'firebase/app';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { jsPDF } from 'jspdf';
-import { generateAndDownloadPDF, CertificateData } from '../../utils/certificateUtils.tsx'; // adjust path as needed
+import { generateAndDownloadPDF, CertificateData } from '../../utils/certificateUtils.tsx';
 
 const db = getFirestore(getApp());
 const storage = getStorage(getApp());
@@ -57,10 +57,20 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
     }
   }, [currentUser, courseId, navigate]);
 
-  const generateCertificateNumber = () => {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `CERT-${courseId.substring(0, 4)}-${timestamp}-${random}`;
+  const generateCertificateNumber = (userId: string) => {
+    const now = new Date();
+    
+    // Format date as YYYYMMDD-HHMM
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    const dateStr = `${year}${month}${day}-${hours}${minutes}`;
+    const userPrefix = userId.substring(0, 3); // First 3 characters of user ID
+    
+    return `CERT-${courseId.substring(0, 4)}-${dateStr}-${userPrefix}`;
   };
 
   const generateCertificatePDF = async (certificateNumber: string, score: number): Promise<string> => {
@@ -141,11 +151,10 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
       return;
     }
 
-    // Now TypeScript knows currentUser.uid is definitely not undefined
     const userId = currentUser.uid;
 
     try {
-      const certificateNumber = generateCertificateNumber();
+      const certificateNumber = generateCertificateNumber(userId);
       const pdfData = await generateCertificatePDF(certificateNumber, finalScore);
 
       // Upload PDF to Storage
@@ -155,10 +164,10 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
 
       const now = Timestamp.now();
 
-      // First, create the certificate
+      // Create certificate
       await addDoc(collection(db, 'certificates'), {
         courseId,
-        userId: currentUser.uid, // Explicitly set user ID
+        userId: currentUser.uid,
         userName: currentUser.displayName,
         certificateNumber,
         completionDate: now,
@@ -167,8 +176,8 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
         status: 'active'
       });
 
-      // Then update the user's document with ONLY the completedCourses field
-      const userDocRef = firestoreDoc(db, 'users', userId);  // Using the safely typed userId
+      // Update user's completed courses
+      const userDocRef = firestoreDoc(db, 'users', userId);
       const completedCourse = {
         courseId,
         completedAt: now,

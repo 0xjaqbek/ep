@@ -128,58 +128,59 @@ export const CourseList: React.FC = () => {
     }
   };
 
-  const generateCertificate = async (course: Course, user: User) => {
-    try {
-      if (!user.uid) {
-        throw new Error('User not authenticated');
-      }
-
-      const certificateNumber = `CERT-${course.id.substring(0, 4)}-${Date.now()}-${
-        Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-      }`;
-
-      const now = Timestamp.now();
-
-      // Create certificate record
-      const certificateData = {
-        userId: user.uid,
-        userName: user.displayName,
-        courseId: course.id,
-        courseName: course.title,
-        certificateNumber,
-        completionDate: now,
-        score: 100,
-        status: 'active'
-      };
-
-      await addDoc(collection(db, 'certificates'), certificateData);
-
-      // Update user's completed courses
-      const userRef = firestoreDoc(db, 'users', user.uid);
-      const completedCourseData = {
-        courseId: course.id,
-        completedAt: now,
-        certificateNumber,
-        score: 100
-      };
-
-      await updateDoc(userRef, {
-        completedCourses: arrayUnion(completedCourseData)
-      });
-
-      // Generate and download PDF
-      generateAndDownloadPDF({
-        userName: user.displayName,
-        courseName: course.title,
-        certificateNumber,
-        completionDate: now.toDate()
-      });
-
-    } catch (error) {
-      console.error('Error generating certificate:', error);
-      throw error;
+// Update the certificate generation part in src/components/Courses/CourseList.tsx
+const generateCertificate = async (course: Course, user: User) => {
+  try {
+    if (!user.uid) {
+      throw new Error('User not authenticated');
     }
-  };
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    const dateStr = `${year}${month}${day}-${hours}${minutes}`;
+    const userPrefix = user.uid.substring(0, 3);
+    
+    const certificateNumber = `CERT-${course.id.substring(0, 4)}-${dateStr}-${userPrefix}`;
+
+    const now_timestamp = Timestamp.now();
+
+    // Create certificate record
+    const certificateData = {
+      userId: user.uid,
+      userName: user.displayName,
+      courseId: course.id,
+      courseName: course.title,
+      certificateNumber,
+      completionDate: now_timestamp,
+      score: 100,
+      status: 'active'
+    };
+
+    await addDoc(collection(db, 'certificates'), certificateData);
+
+    // Update user's completed courses
+    const userRef = firestoreDoc(db, 'users', user.uid);
+    const completedCourseData = {
+      courseId: course.id,
+      completedAt: now_timestamp,
+      certificateNumber,
+      score: 100
+    };
+
+    await updateDoc(userRef, {
+      completedCourses: arrayUnion(completedCourseData)
+    });
+
+  } catch (error) {
+    console.error('Error generating certificate:', error);
+    throw error;
+  }
+};
 
   if (loading) {
     return (
