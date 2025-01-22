@@ -1,26 +1,29 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Reguły dla plików kursów
-    match /courses/{courseId}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-        (request.auth.token.role == 'admin');
-    }
-    
-    // Reguły dla certyfikatów
-    match /certificates/{userId}/{fileName} {
-      allow read: if request.auth != null && 
-        (request.auth.uid == userId || request.auth.token.role == 'admin');
-      allow write: if request.auth != null && 
-        request.auth.token.role == 'admin';
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == 'admin';
     }
 
-    // Reguły dla miniatur kursów
+    // Course files
+    match /courses/{courseId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Certificate files
+    match /certificates/{userId}/{fileName} {
+      allow read: if request.auth != null && 
+        (request.auth.uid == userId || isAdmin());
+      allow create, write: if request.auth != null && 
+        (request.auth.uid == userId || isAdmin());  // Allow users to create their own certificates
+    }
+
+    // Thumbnails
     match /thumbnails/{fileName} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        request.auth.token.role == 'admin';
+      allow write: if isAdmin();
     }
   }
 }
