@@ -20,6 +20,7 @@ import { getApp } from 'firebase/app';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { jsPDF } from 'jspdf';
 import { generateAndDownloadPDF, CertificateData } from '../../utils/certificateUtils.tsx';
+import { LoadingSpinner } from '../Loading/LoadingSpinner.tsx';
 
 const db = getFirestore(getApp());
 const storage = getStorage(getApp());
@@ -45,6 +46,7 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [certificateNumber, setCertificateNumber] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentUser) {
@@ -116,6 +118,17 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
     return pdfDoc.output('datauristring');
   };
 
+  const handleCertificateDownload = () => {
+    if (currentUser && certificateNumber) {
+      generateAndDownloadPDF({
+        userName: currentUser.displayName,
+        courseName: courseName,
+        certificateNumber: certificateNumber,
+        completionDate: new Date()
+      });
+    }
+  };
+
   const handleAnswer = async (answerIndex: number) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = answerIndex;
@@ -155,6 +168,7 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
 
     try {
       const certificateNumber = generateCertificateNumber(userId);
+      setCertificateNumber(certificateNumber);
       const pdfData = await generateCertificatePDF(certificateNumber, finalScore);
 
       // Upload PDF to Storage
@@ -232,47 +246,22 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
               )}
             </div>
             <div className="flex flex-col gap-3">
-              {/* First button - Download Certificate */}
-              {currentUser?.completedCourses?.some(cc => cc.courseId === courseId) && (
-                <button
-                  onClick={() => {
-                    const completedCourse = currentUser.completedCourses.find(
-                      cc => cc.courseId === courseId
-                    );
-                    if (completedCourse) {
-                      generateAndDownloadPDF({
-                        userName: currentUser.displayName,
-                        courseName: courseName,
-                        certificateNumber: completedCourse.certificateNumber,
-                        completionDate: completedCourse.completedAt.toDate()
-                      });
-                    }
-                  }}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
-                  disabled={loading}
-                >
-                  Pobierz certyfikat
-                </button>
-              )}
+  <button
+    onClick={handleCertificateDownload}
+    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+    disabled={loading}
+  >
+    {loading ? <LoadingSpinner size="small" /> : 'Pobierz certyfikat'}
+  </button>
 
-              {/* Second button - Return to course */}
-              <button
-                onClick={onClose}
-                className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
-                disabled={loading}
-              >
-                Wróć do kursu
-              </button>
-
-              {/* Third button - Course list */}
-              <button
-                onClick={() => navigate('/courses')}
-                className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
-                disabled={loading}
-              >
-                Lista kursów
-              </button>
-            </div>
+  <button
+    onClick={() => navigate('/courses')}
+    className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
+    disabled={loading}
+  >
+    Lista kursów
+  </button>
+</div>
           </div>
         ) : (
           <div className="space-y-4">

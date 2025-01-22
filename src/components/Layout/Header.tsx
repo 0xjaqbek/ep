@@ -1,5 +1,5 @@
-// File: src/components/Layout/Header.tsx
-import React from 'react';
+// src/components/Layout/Header.tsx
+import React, { useState } from 'react';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { auth } from '../../firebase/config.ts';
@@ -8,6 +8,7 @@ export const Header: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Don't show header on landing page
   if (location.pathname === '/') {
@@ -35,25 +36,66 @@ export const Header: React.FC = () => {
           
           <div className="flex items-center space-x-4">
             {currentUser ? (
-              <>
-                <span className="text-gray-700">
-                  {currentUser.email}
-                </span>
-                {currentUser.role === 'admin' && (
-                  <Link 
-                    to="/admin" 
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Panel Admina
-                  </Link>
-                )}
+              <div className="relative">
                 <button
-                  onClick={handleLogout}
-                  className="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
                 >
-                  Wyloguj
+                  <span>{currentUser.email}</span>
+                  <svg
+                    className={`h-5 w-5 transform transition-transform ${
+                      showUserMenu ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
                 </button>
-              </>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
+                    <Link
+                      to="/account"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Moje konto
+                    </Link>
+                    <Link
+                      to="/courses"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Moje kursy
+                    </Link>
+                    {currentUser.role === 'admin' && (
+                      <Link
+                        to="/admin"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Panel Admina
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setShowUserMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Wyloguj się
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="space-x-4">
                 <Link 

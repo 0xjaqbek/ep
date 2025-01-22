@@ -84,8 +84,10 @@ export const CourseList: React.FC = () => {
       try {
         const userDoc = await getDoc(firestoreDoc(db, 'users', currentUser.uid));
         if (userDoc.exists()) {
-          // Update courses after refreshing user data
-          fetchCourses();
+          // Only fetch courses if needed, e.g., if courses array is empty
+          if (courses.length === 0) {
+            await fetchCourses();
+          }
         }
       } catch (error) {
         console.error('Error refreshing user data:', error);
@@ -111,33 +113,46 @@ export const CourseList: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const initializeData = async () => {
       setLoading(true);
-      await refreshUserData();
-      setLoading(false);
-    };
-
-    fetchData();
-
-    // Add event listeners for page visibility and focus
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        refreshUserData();
+      try {
+        // Fetch courses regardless of user authentication
+        await fetchCourses();
+        
+        // Only refresh user data if logged in
+        if (currentUser?.uid) {
+          await refreshUserData();
+        }
+      } catch (error) {
+        console.error('Error initializing data:', error);
+        setError('Wystąpił błąd podczas ładowania danych');
+      } finally {
+        setLoading(false);
       }
     };
-
-    const handleFocus = () => {
-      refreshUserData();
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    // Cleanup
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
+  
+    initializeData();
+  
+    // Only add visibility and focus handlers if user is logged in
+    if (currentUser?.uid) {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          refreshUserData();
+        }
+      };
+  
+      const handleFocus = () => {
+        refreshUserData();
+      };
+  
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('focus', handleFocus);
+  
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('focus', handleFocus);
+      };
+    }
   }, [currentUser?.uid]);
 
   const handleCourseAction = async (course: Course) => {
