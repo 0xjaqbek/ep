@@ -57,7 +57,7 @@ const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-y-hidden">
       {/* Background image */}
       <div
         className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
@@ -68,7 +68,7 @@ const LandingPage: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col justify-start items-center max-w-5xl mx-auto text-center space-y-5 bg-black/20 p-4 rounded-lg backdrop-blur-sm">
+      <div className="relative z-10 flex flex-col justify-start items-center max-w-5xl mx-auto text-center space-y-5 bg-black/20 p-4 backdrop-blur-sm min-h-screen">
         <img
           src={logoEP}
           alt="EP Logo"
