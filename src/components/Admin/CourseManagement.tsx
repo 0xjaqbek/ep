@@ -64,63 +64,67 @@ export const CourseManagement: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (values: Partial<Course>, { resetForm }: any) => {
-    try {
-      // Additional role check at submission
-      if (!currentUser || currentUser.role !== 'admin') {
-        throw new Error('Unauthorized: Admin access required');
-      }
-      let videoUrl: string | undefined = selectedCourse?.videoUrl;
-      let thumbnailUrl: string | undefined = selectedCourse?.thumbnail;
+  let videoUrl: string | undefined = undefined;
+  let thumbnailUrl: string | undefined = undefined;
 
-      // Handle video file upload
-      if (videoFile) {
-        videoUrl = await handleFileUpload(
-          videoFile,
-          `courses/videos/${Date.now()}_${videoFile.name}`
-        );
-      }
-
-      // Handle thumbnail file upload
-      if (thumbnailFile) {
-        thumbnailUrl = await handleFileUpload(
-          thumbnailFile,
-          `courses/thumbnails/${Date.now()}_${thumbnailFile.name}`
-        );
-      }
-
-      const courseData: Partial<Course> = {
-        ...values,
-        videoUrl,
-        thumbnail: thumbnailUrl,
-        updatedAt: new Date(),
-        testQuestions: selectedCourse?.testQuestions || [],
-        isPublished: selectedCourse?.isPublished || false
-      };
-
-      if (selectedCourse) {
-        // Update existing course
-        await updateDoc(doc(db, 'courses', selectedCourse.id), courseData);
-      } else {
-        // Add new course
-        await addDoc(collection(db, 'courses'), {
-          ...courseData,
-          createdAt: new Date()
-        });
-      }
-
-      // Reset form and state
-      resetForm();
-      setSelectedCourse(null);
-      setVideoFile(null);
-      setThumbnailFile(null);
-      
-      // Refresh courses
-      await fetchCourses();
-    } catch (error) {
-      console.error('Error saving course:', error);
-      alert('Wystąpił błąd podczas zapisywania kursu');
+  useEffect(() => {
+    if(currentUser) {
+      auth.currentUser?.getIdTokenResult().then(token => {
+        console.log('Admin role:', token.claims.role);
+      });
     }
+  }, [currentUser]);
+  
+  const handleSubmit = async (values: Partial<Course>, { resetForm }: any) => {
+        // Debug user and token info
+        const token = await auth.currentUser?.getIdTokenResult();
+        console.log('User:', currentUser);
+        console.log('Token claims:', token?.claims);
+
+   try {
+     if (!currentUser || currentUser.role !== 'admin') {
+       throw new Error('Unauthorized: Admin access required');
+     }
+  
+     if (videoFile) {
+       videoUrl = await handleFileUpload(
+         videoFile,
+         `courses/videos/${Date.now()}_${videoFile.name}`
+       );
+     }
+  
+     if (thumbnailFile) {
+       thumbnailUrl = await handleFileUpload(
+         thumbnailFile,
+         `courses/thumbnails/${Date.now()}_${thumbnailFile.name}`
+       );
+     }
+  
+     const courseData: Partial<Course> = {
+       ...values,
+       videoUrl: videoUrl || '',
+       thumbnail: thumbnailUrl || '',
+       updatedAt: new Date(),
+       testQuestions: selectedCourse?.testQuestions || [],
+       isPublished: selectedCourse?.isPublished || false,
+       createdAt: new Date()
+     };
+  
+     if (selectedCourse) {
+       await updateDoc(doc(db, 'courses', selectedCourse.id), courseData);
+     } else {
+       await addDoc(collection(db, 'courses'), courseData);
+     }
+  
+     resetForm();
+     setSelectedCourse(null);
+     setVideoFile(null);
+     setThumbnailFile(null);
+     await fetchCourses();
+   } catch (error) {
+     console.error('Error saving course:', error);
+     alert('Error during course save');
+   }
   };
 
   const handleDelete = async (courseId: string) => {
