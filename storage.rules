@@ -1,13 +1,23 @@
 rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    match /courses/{courseId} {
-      allow read: if true;
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    match /certificates/{userName}/{fileName} {
+      allow read: if isAuthenticated() && 
+        (resource.metadata.userId == request.auth.uid || isAdmin());
+      allow write: if isAuthenticated() && 
+        (request.resource.metadata.userId == request.auth.uid || isAdmin());
+    }
+
+    match /{allPaths=**} {
+      allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
   }

@@ -172,8 +172,12 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
       const pdfData = await generateCertificatePDF(certificateNumber, finalScore);
 
       // Upload PDF to Storage
-      const pdfRef = ref(storage, `certificates/${userId}/${certificateNumber}.pdf`);
-      await uploadString(pdfRef, pdfData, 'data_url');
+      const pdfRef = ref(storage, `certificates/${currentUser.displayName}/${certificateNumber}.pdf`);
+      await uploadString(pdfRef, pdfData, 'data_url', {
+        customMetadata: {
+          userId: currentUser.uid
+        }
+      });
       const pdfUrl = await getDownloadURL(pdfRef);
 
       const now = Timestamp.now();
