@@ -11,8 +11,9 @@ import {
   getDocs 
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../firebase/config.ts';
+import {  auth, db, storage } from '../../firebase/config.ts';
 import { Course } from '../../types';
+import { useAuth } from '../Auth/AuthProvider.tsx';
 
 const CourseSchema = Yup.object().shape({
   title: Yup.string().required('Wymagane'),
@@ -26,6 +27,7 @@ export const CourseManagement: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     fetchCourses();
@@ -40,17 +42,38 @@ export const CourseManagement: React.FC = () => {
     setCourses(coursesData);
   };
 
-  const handleFileUpload = async (file: File, path: string) => {
-    const fileRef = ref(storage, path);
-    await uploadBytes(fileRef, file);
-    return getDownloadURL(fileRef);
+  const handleFileUpload = async (file: File, path: string): Promise<string> => {
+    try {
+      // Explicit role check
+      if (!currentUser || currentUser.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+
+      console.log('Current user role:', currentUser.role);
+      console.log('Upload path:', path);
+
+      const fileRef = ref(storage, path);
+      await uploadBytes(fileRef, file);
+      const downloadURL = await getDownloadURL(fileRef);
+      
+      console.log('Download URL:', downloadURL);
+      return downloadURL;
+    } catch (error) {
+      console.error('Upload error details:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (values: Partial<Course>, { resetForm }: any) => {
     try {
-      let videoUrl = selectedCourse?.videoUrl;
-      let thumbnailUrl = selectedCourse?.thumbnail;
+      // Additional role check at submission
+      if (!currentUser || currentUser.role !== 'admin') {
+        throw new Error('Unauthorized: Admin access required');
+      }
+      let videoUrl: string | undefined = selectedCourse?.videoUrl;
+      let thumbnailUrl: string | undefined = selectedCourse?.thumbnail;
 
+      // Handle video file upload
       if (videoFile) {
         videoUrl = await handleFileUpload(
           videoFile,
@@ -58,6 +81,7 @@ export const CourseManagement: React.FC = () => {
         );
       }
 
+      // Handle thumbnail file upload
       if (thumbnailFile) {
         thumbnailUrl = await handleFileUpload(
           thumbnailFile,
@@ -65,7 +89,7 @@ export const CourseManagement: React.FC = () => {
         );
       }
 
-      const courseData = {
+      const courseData: Partial<Course> = {
         ...values,
         videoUrl,
         thumbnail: thumbnailUrl,
@@ -75,19 +99,24 @@ export const CourseManagement: React.FC = () => {
       };
 
       if (selectedCourse) {
+        // Update existing course
         await updateDoc(doc(db, 'courses', selectedCourse.id), courseData);
       } else {
+        // Add new course
         await addDoc(collection(db, 'courses'), {
           ...courseData,
           createdAt: new Date()
         });
       }
 
+      // Reset form and state
       resetForm();
       setSelectedCourse(null);
       setVideoFile(null);
       setThumbnailFile(null);
-      fetchCourses();
+      
+      // Refresh courses
+      await fetchCourses();
     } catch (error) {
       console.error('Error saving course:', error);
       alert('Wystąpił błąd podczas zapisywania kursu');
@@ -98,7 +127,7 @@ export const CourseManagement: React.FC = () => {
     if (window.confirm('Czy na pewno chcesz usunąć ten kurs?')) {
       try {
         await deleteDoc(doc(db, 'courses', courseId));
-        fetchCourses();
+        await fetchCourses();
       } catch (error) {
         console.error('Error deleting course:', error);
         alert('Wystąpił błąd podczas usuwania kursu');
@@ -123,56 +152,56 @@ export const CourseManagement: React.FC = () => {
       >
         {({ errors, touched }) => (
           <Form className="space-y-4 mb-8">
-            <div>
-              <label className="block mb-1">Tytuł</label>
-              <Field
-                name="title"
-                className="w-full p-2 border rounded"
-              />
-              {errors.title && touched.title && (
-                <div className="text-red-500">{errors.title}</div>
-              )}
-            </div>
+          <div>
+            <label className="block mb-1">Tytuł</label>
+            <Field
+              name="title"
+              className="w-full p-2 border rounded"
+            />
+            {errors.title && touched.title && (
+              <div className="text-red-500">{errors.title}</div>
+            )}
+          </div>
 
-            <div>
-              <label className="block mb-1">Opis</label>
-              <Field
-                name="description"
-                as="textarea"
-                className="w-full p-2 border rounded"
-              />
-              {errors.description && touched.description && (
-                <div className="text-red-500">{errors.description}</div>
-              )}
-            </div>
+          <div>
+            <label className="block mb-1">Opis</label>
+            <Field
+              name="description"
+              as="textarea"
+              className="w-full p-2 border rounded"
+            />
+            {errors.description && touched.description && (
+              <div className="text-red-500">{errors.description}</div>
+            )}
+          </div>
 
-            <div>
-              <label className="block mb-1">Cena (PLN)</label>
-              <Field
-                name="price"
-                type="number"
-                className="w-full p-2 border rounded"
-              />
-              {errors.price && touched.price && (
-                <div className="text-red-500">{errors.price}</div>
-              )}
-            </div>
+          <div>
+            <label className="block mb-1">Cena (PLN)</label>
+            <Field
+              name="price"
+              type="number"
+              className="w-full p-2 border rounded"
+            />
+            {errors.price && touched.price && (
+              <div className="text-red-500">{errors.price}</div>
+            )}
+          </div>
 
-            <div>
-              <label className="block mb-1">Czas trwania (minuty)</label>
-              <Field
-                name="duration"
-                type="number"
-                className="w-full p-2 border rounded"
-              />
-              {errors.duration && touched.duration && (
-                <div className="text-red-500">{errors.duration}</div>
-              )}
-            </div>
+          <div>
+            <label className="block mb-1">Czas trwania (minuty)</label>
+            <Field
+              name="duration"
+              type="number"
+              className="w-full p-2 border rounded"
+            />
+            {errors.duration && touched.duration && (
+              <div className="text-red-500">{errors.duration}</div>
+            )}
+          </div>
 
-            <div>
-              <label className="block mb-1">Video</label>
-              <input
+          <div>
+            <label className="block mb-1">Video</label>
+            <input
                 type="file"
                 accept="video/*"
                 onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
@@ -181,7 +210,7 @@ export const CourseManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="block mb-1">Miniatura</label>
+              <label>Miniatura</label>
               <input
                 type="file"
                 accept="image/*"
@@ -200,9 +229,10 @@ export const CourseManagement: React.FC = () => {
         )}
       </Formik>
 
+      {/* Course list rendering */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map(course => (
-          <div key={course.id} className="border rounded p-4">
+          <div key={course.id} className="border rounded-lg p-4">
             <h3 className="text-xl font-bold mb-2">{course.title}</h3>
             <p className="mb-2">{course.description}</p>
             <p>Cena: {course.price} PLN</p>

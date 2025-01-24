@@ -36,11 +36,11 @@ export interface Course {
   title: string;
   description: string;
   price: number;
-  videoUrl: string;
   duration: number;
-  testQuestions: TestQuestion[];
-  thumbnail: string;
-  isPublished: boolean;
+  videoUrl?: string;
+  thumbnail?: string;
+  testQuestions?: TestQuestion[];
+  isPublished?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,27 +1,12 @@
 rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // Helper function to check if user is admin
+service cloud.firestore {
+  match /databases/{database}/documents {
     function isAdmin() {
-      return request.auth != null && request.auth.token.role == 'admin';
+      return request.auth != null && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Course files
-    match /courses/{courseId}/{fileName} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-    
-    // Certificate files
-    match /certificates/{userId}/{fileName} {
-      allow read: if request.auth != null && 
-        (request.auth.uid == userId || isAdmin());
-      allow create, write: if request.auth != null && 
-        (request.auth.uid == userId || isAdmin());  // Allow users to create their own certificates
-    }
-
-    // Thumbnails
-    match /thumbnails/{fileName} {
+    match /courses/{courseId} {
       allow read: if true;
       allow write: if isAdmin();
     }
