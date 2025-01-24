@@ -38,21 +38,19 @@ import {
   
     async loginWithGoogle() {
       try {
-        // Sign in with Google
         const result = await signInWithPopup(auth, this.googleProvider);
         const user = result.user;
-  
-        // Check if user document exists
+    
         const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
-  
+    
         if (!userDoc.exists()) {
-          // Create new user document if it doesn't exist
+          // Create new user document with default 'student' role
           await setDoc(userRef, {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName || 'User',
-            role: 'student',
+            role: 'student', // Default role
             phoneNumber: user.phoneNumber || '',
             address: {
               street: '',
@@ -67,12 +65,14 @@ import {
             provider: 'google'
           });
         } else {
-          // Update last login time
+          // Preserve existing role when logging in
+          const existingUserData = userDoc.data();
           await setDoc(userRef, {
-            lastLoginAt: serverTimestamp()
+            lastLoginAt: serverTimestamp(),
+            role: existingUserData?.role || 'student' // Preserve existing role
           }, { merge: true });
         }
-  
+    
         return user;
       } catch (error: any) {
         console.error('Google sign in error:', error);

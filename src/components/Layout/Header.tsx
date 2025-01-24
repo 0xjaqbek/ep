@@ -10,6 +10,29 @@ export const Header: React.FC = () => {
  const location = useLocation();
  const [showUserMenu, setShowUserMenu] = useState(false);
 
+  // Add a ref to track the menu and button
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+ 
+  // Handle clicks outside the menu
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current && 
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current && 
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+ 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
  if (location.pathname === '/') {
    return null;
  }
@@ -50,9 +73,10 @@ export const Header: React.FC = () => {
            {currentUser ? (
              <div className="relative">
                <button
-                 onClick={() => setShowUserMenu(!showUserMenu)}
-                 className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
-               >
+                    ref={buttonRef}
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+                  >
                  <span>Moje konto</span>
                  <svg
                    className={`h-5 w-5 transform transition-transform ${
@@ -72,7 +96,7 @@ export const Header: React.FC = () => {
                </button>
 
                {showUserMenu && (
-                 <div className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
+                  <div ref={menuRef} className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
                    <div className="px-4 py-2 text-sm font-medium text-gray-500 border-b border-gray-100">
                      {currentUser.email}
                    </div>

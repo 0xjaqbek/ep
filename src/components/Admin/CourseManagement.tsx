@@ -31,6 +31,14 @@ export const CourseManagement: React.FC = () => {
 
   useEffect(() => {
     fetchCourses();
+  
+    // Add these logging statements
+    if (currentUser) {
+      auth.currentUser?.getIdTokenResult().then(token => {
+        console.log('Token Claims:', token.claims);
+        console.log('User Role:', currentUser.role);
+      });
+    }
   }, []);
 
   const fetchCourses = async () => {

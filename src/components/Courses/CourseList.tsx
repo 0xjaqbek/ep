@@ -245,7 +245,10 @@ export const CourseList: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map(course => (
-            <div key={course.id} className="border rounded-lg overflow-hidden shadow-lg bg-white">
+              <div 
+              key={course.id} 
+              className="border rounded-lg overflow-hidden shadow-lg bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-blue-500"
+            >
               {course.thumbnail && (
                 <div className="relative h-48">
                   <img 

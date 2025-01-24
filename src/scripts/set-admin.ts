@@ -1,29 +1,32 @@
 import * as admin from 'firebase-admin';
-const serviceAccount = require('../../punkty999-31eff-firebase-adminsdk-fbsvc-b617ca8b2b.json');
+import * as path from 'path';
+
+// Path to your Firebase service account key JSON
+const serviceAccountPath = path.resolve(__dirname, '../../punkty999-31eff-firebase-adminsdk-fbsvc-b617ca8b2b.json');
 
 admin.initializeApp({
- credential: admin.credential.cert(serviceAccount),
- databaseURL: "https://punkty999-31eff.firebaseio.com"
+  credential: admin.credential.cert(serviceAccountPath)
 });
 
-const targetUid = 'WlvcmBqfnmUknQGtIIWSH0sttmY2';
+// Replace with the admin user's UID
+const adminUid = 'WlvcmBqfnmUknQGtIIWSH0sttmY2';
 
-async function setAdminRole(): Promise<void> {
- try {
-   await admin.auth().setCustomUserClaims(targetUid, {role: 'admin'});
-   
-   const userRef = admin.firestore().collection('users').doc(targetUid);
-   await userRef.update({
-     role: 'admin',
-     updatedAt: admin.firestore.FieldValue.serverTimestamp()
-   });
-   
-   console.log(`Admin role set for user ${targetUid}`);
- } catch (error) {
-   console.error('Error:', error);
- } finally {
-   process.exit();
- }
+async function setAdminRole() {
+  try {
+    await admin.auth().setCustomUserClaims(adminUid, { role: 'admin' });
+    
+    const userRef = admin.firestore().collection('users').doc(adminUid);
+    await userRef.update({
+      role: 'admin',
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    console.log(`Admin role set for user ${adminUid}`);
+  } catch (error) {
+    console.error('Error setting admin role:', error);
+  } finally {
+    process.exit();
+  }
 }
 
 setAdminRole();

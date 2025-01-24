@@ -37,12 +37,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var admin = require("firebase-admin");
-var serviceAccount = require('../../punkty999-31eff-firebase-adminsdk-fbsvc-b617ca8b2b.json');
+var path = require("path");
+// Path to your Firebase service account key JSON
+var serviceAccountPath = path.resolve(__dirname, '../../punkty999-31eff-firebase-adminsdk-fbsvc-b617ca8b2b.json');
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://punkty999-31eff.firebaseio.com"
+    credential: admin.credential.cert(serviceAccountPath)
 });
-var targetUid = 'WlvcmBqfnmUknQGtIIWSH0sttmY2';
+// Replace with the admin user's UID
+var adminUid = 'WlvcmBqfnmUknQGtIIWSH0sttmY2';
 function setAdminRole() {
     return __awaiter(this, void 0, void 0, function () {
         var userRef, error_1;
@@ -50,21 +52,21 @@ function setAdminRole() {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, 4, 5]);
-                    return [4 /*yield*/, admin.auth().setCustomUserClaims(targetUid, { role: 'admin' })];
+                    return [4 /*yield*/, admin.auth().setCustomUserClaims(adminUid, { role: 'admin' })];
                 case 1:
                     _a.sent();
-                    userRef = admin.firestore().collection('users').doc(targetUid);
+                    userRef = admin.firestore().collection('users').doc(adminUid);
                     return [4 /*yield*/, userRef.update({
                             role: 'admin',
                             updatedAt: admin.firestore.FieldValue.serverTimestamp()
                         })];
                 case 2:
                     _a.sent();
-                    console.log("Admin role set for user ".concat(targetUid));
+                    console.log("Admin role set for user ".concat(adminUid));
                     return [3 /*break*/, 5];
                 case 3:
                     error_1 = _a.sent();
-                    console.error('Error:', error_1);
+                    console.error('Error setting admin role:', error_1);
                     return [3 /*break*/, 5];
                 case 4:
                     process.exit();

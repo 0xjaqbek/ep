@@ -6,6 +6,7 @@ import ambu2 from '../assets/ambu2.jpg';
 import ambu3 from '../assets/ambu3.jpg';
 import ambu4 from '../assets/ambu4.jpg';
 import ambu5 from '../assets/ambu5.jpg';
+import { Footer } from '../components/Layout/Footer.tsx';
 
 const backgroundImages = [ambu1, ambu2, ambu3, ambu4, ambu5];
 
@@ -112,6 +113,8 @@ const LandingPage: React.FC = () => {
           </Link>
         </div>
       </div>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

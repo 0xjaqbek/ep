@@ -32,6 +32,7 @@ import { Header } from './components/Layout/Header.tsx';
 import LandingPage from './components/LandingPage.tsx';
 import CookieConsent from './components/Common/CookieConsent.tsx';
 import { UserAccount } from './components/User/UserAccount.tsx';
+import { Footer } from './components/Layout/Footer.tsx';
 
 // Error Pages
 const NotFoundPage: React.FC = () => (
@@ -123,6 +124,7 @@ const App: React.FC = () => {
               </Routes>
             </main>
             <CookieConsent />
+            <Footer />
           </div>
         </AuthProvider>
       </Router>
