@@ -73,6 +73,9 @@ export const Header: React.FC = () => {
 
                {showUserMenu && (
                  <div className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
+                   <div className="px-4 py-2 text-sm font-medium text-gray-500 border-b border-gray-100">
+                     {currentUser.email}
+                   </div>
                    <Link
                      to="/account"
                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -109,18 +112,18 @@ export const Header: React.FC = () => {
                )}
              </div>
            ) : (
-             <div className="space-x-4">
-               <Link 
-                 to="/login"
-                 className="text-blue-600 hover:text-blue-800"
-               >
-                 Zaloguj
-               </Link>
+             <div className="flex flex-col space-y-2">
                <Link 
                  to="/register"
                  className="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                >
                  Zarejestruj
+               </Link>
+               <Link 
+                 to="/login"
+                 className="text-sm border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-50"
+               >
+                 Zaloguj
                </Link>
              </div>
            )}
