@@ -53,10 +53,10 @@ export const AdminLayout: React.FC = () => {
             Certyfikaty
           </Link>
           <Link
-            to="/admin/reports"
-            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/reports')}`}
+            to="/admin/messages"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/messages')}`}
           >
-            Raporty
+            Wiadomości
           </Link>
         </nav>
       </aside>
