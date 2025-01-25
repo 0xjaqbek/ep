@@ -58,6 +58,12 @@ export const AdminLayout: React.FC = () => {
           >
             Wiadomości
           </Link>
+          <Link
+            to="/admin/opinions"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/opinions')}`}
+          >
+            Opinie
+          </Link>
         </nav>
       </aside>
 

@@ -65,3 +65,12 @@ export interface Certificate {
   revokedAt?: Timestamp;      // Changed from Date to Timestamp
   replacedAt?: Timestamp;     // Changed from Date to Timestamp
 }
+
+export interface RatingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  courseId: string;
+  courseName: string;
+  userId: string;
+  userName: string;
+}

@@ -16,6 +16,8 @@ import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import logoImage from '../../assets/logoEP.png';
+import { RatingModal } from '../RatingModal.tsx';
+
 
 interface CertificateData {
   userName: string;
@@ -78,6 +80,7 @@ export const CourseList: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const refreshUserData = async () => {
     if (currentUser?.uid) {
@@ -298,27 +301,35 @@ export const CourseList: React.FC = () => {
                             : 'Kup teraz'}
                       </button>
                       {currentUser?.completedCourses?.some(cc => cc.courseId === course.id) && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (currentUser) {
-                              const completedCourse = currentUser.completedCourses.find(
-                                cc => cc.courseId === course.id
-                              );
-                              if (completedCourse) {
-                                generateAndDownloadPDF({
-                                  userName: currentUser.displayName,
-                                  courseName: course.title,
-                                  certificateNumber: completedCourse.certificateNumber,
-                                  completionDate: completedCourse.completedAt.toDate()
-                                });
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (currentUser) {
+                                const completedCourse = currentUser.completedCourses.find(
+                                  cc => cc.courseId === course.id
+                                );
+                                if (completedCourse) {
+                                  generateAndDownloadPDF({
+                                    userName: currentUser.displayName,
+                                    courseName: course.title,
+                                    certificateNumber: completedCourse.certificateNumber,
+                                    completionDate: completedCourse.completedAt.toDate()
+                                  });
+                                }
                               }
-                            }
-                          }}
-                          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                        >
-                          Pobierz certyfikat
-                        </button>
+                            }}
+                            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                          >
+                            Pobierz certyfikat
+                          </button>
+                          <button
+                            onClick={() => setSelectedCourse(course)}
+                            className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors"
+                          >
+                            Oceń kurs
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -328,6 +339,17 @@ export const CourseList: React.FC = () => {
           ))}
         </div>
       )}
+      {selectedCourse && currentUser && (
+        <RatingModal
+        isOpen={!!selectedCourse}
+        onClose={() => setSelectedCourse(null)}
+        courseId={selectedCourse.id}
+        courseName={selectedCourse.title}
+        userId={currentUser?.uid || ''}  // Add a fallback empty string
+        userName={currentUser?.displayName || ''}  // Add a fallback empty string
+        />
+      )}
+    
     </div>
   );
 };

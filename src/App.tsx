@@ -14,6 +14,7 @@ import { TestManagement } from './components/Admin/TestManagement.tsx';
 import { CourseManagement } from './components/Admin/CourseManagement.tsx';
 import { UserManagement } from './components/Admin/UserManagement.tsx';
 import { MessagesManagement } from './components/Admin/MessagesManagement.tsx';
+import { OpinionsManagement } from './components/Admin/OpinionsManagement.tsx';
 
 // Auth Components
 import { Login } from './components/Auth/Login.tsx';
@@ -125,6 +126,7 @@ const App: React.FC = () => {
                       <Route path="payments" element={<PaymentManagement />} />
                       <Route path="certificates" element={<CertificateManagement />} />
                       <Route path="messages" element={<MessagesManagement />} />
+                      <Route path="opinions" element={<OpinionsManagement />} />
                     </Route>
 
                     {/* 404 Route */}

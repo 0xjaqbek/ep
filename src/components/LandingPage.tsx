@@ -6,12 +6,14 @@ import ambu2 from '../assets/ambu2.jpg';
 import ambu3 from '../assets/ambu3.jpg';
 import ambu4 from '../assets/ambu4.jpg';
 import ambu5 from '../assets/ambu5.jpg';
+import { OpinionsDialog  } from '../components/OpinionsDialog.tsx';
 
 const backgroundImages = [ambu1, ambu2, ambu3, ambu4, ambu5];
 
 const LandingPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showOpinions, setShowOpinions] = useState(false);
 
   useEffect(() => {
     Promise.all(
@@ -50,14 +52,14 @@ const LandingPage = () => {
           minHeight: '100vh'
         }}
       />
-
+ 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center text-white">
         <img
           src={logoEP}
           alt="EP Logo"
           className="w-64 h-auto mb-1"
         />
-
+ 
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold text-white leading-tight mb-1">
             Progres<span className="text-white">999</span>
@@ -69,7 +71,7 @@ const LandingPage = () => {
             –rozwijaj się z nami.
           </p>
         </div>
-
+ 
         <div className="max-w-2xl mb-12 space-y-4 text-lg">
           <p>Witamy na platformie edukacyjnej dedykowanej ratownikom medycznym, 
              oferującej specjalistyczne kursy internetowe z zakresu ratownictwa medycznego.</p>
@@ -80,7 +82,7 @@ const LandingPage = () => {
           <p>Po ukończeniu kursów uczestnicy otrzymują certyfikaty potwierdzające 
              zdobyte punkty edukacyjne.</p>
         </div>
-
+ 
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <Link 
             to="/courses"
@@ -95,10 +97,24 @@ const LandingPage = () => {
           >
             Dołącz do nas
           </Link>
+ 
+          <button
+            onClick={() => setShowOpinions(true)}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-8 py-4 rounded-lg"
+          >
+            Zobacz opinie
+          </button>
         </div>
       </div>
+ 
+      {showOpinions && (
+        <OpinionsDialog 
+          isOpen={showOpinions} 
+          onClose={() => setShowOpinions(false)} 
+        />
+      )}
     </div>
   );
-};
-
-export default LandingPage;
+ };
+ 
+ export default LandingPage;
