@@ -59,7 +59,7 @@ const LandingPage = () => {
         />
 
         <h1 className="text-4xl font-bold mb-6">
-          Platforma Edukacyjna dla Ratowników Medycznych
+          Progres999
         </h1>
 
         <div className="max-w-2xl mb-12 space-y-4 text-lg">
