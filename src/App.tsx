@@ -34,7 +34,6 @@ import CookieConsent from './components/Common/CookieConsent.tsx';
 import { UserAccount } from './components/User/UserAccount.tsx';
 import { Footer } from './components/Layout/Footer.tsx';
 
-// Error Pages
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
     <h1 className="text-2xl font-bold mb-4">404 - Strona nie znaleziona</h1>
@@ -67,62 +66,64 @@ const App: React.FC = () => {
         <AuthProvider>
           <div className="min-h-screen bg-gray-50">
             <Header />
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                <Route path="/courses" element={<CourseList />} />
-                {/* Protected User Routes */}
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/*" element={
+                <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                  <Routes>
+                    <Route path="login" element={<Login />} />
+                    <Route path="register" element={<Register />} />
+                    <Route path="unauthorized" element={<UnauthorizedPage />} />
+                    <Route path="courses" element={<CourseList />} />
+                    
+                    {/* Protected User Routes */}
+                    <Route path="account" element={
+                      <PrivateRoute>
+                        <UserAccount />
+                      </PrivateRoute>
+                    } />
+                    <Route path="course/:id/learn" element={
+                      <PrivateRoute>
+                        <CourseView />
+                      </PrivateRoute>
+                    } />
+                    <Route path="payment/callback" element={
+                      <PrivateRoute>
+                        <PaymentCallback />
+                      </PrivateRoute>
+                    } />
+                    <Route path="payment/checkout" element={
+                      <PrivateRoute>
+                        <PaymentForm />
+                      </PrivateRoute>
+                    } />
+                    <Route path="payment/success" element={
+                      <PrivateRoute>
+                        <PaymentSuccess />
+                      </PrivateRoute>
+                    } />
 
-                <Route path="/account" element={
-                  <PrivateRoute>
-                    <UserAccount />
-                  </PrivateRoute>
-                } />
+                    {/* Protected Admin Routes */}
+                    <Route path="admin" element={
+                      <PrivateRoute requiredRole="admin">
+                        <AdminLayout />
+                      </PrivateRoute>
+                    }>
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route path="dashboard" element={<AnalyticsDashboard />} />
+                      <Route path="courses" element={<CourseManagement />} />
+                      <Route path="tests" element={<TestManagement />} />
+                      <Route path="users" element={<UserManagement />} />
+                      <Route path="payments" element={<PaymentManagement />} />
+                      <Route path="certificates" element={<CertificateManagement />} />
+                    </Route>
 
-                <Route path="/course/:id/learn" element={
-                  <PrivateRoute>
-                    <CourseView />
-                  </PrivateRoute>
-                } />
-                <Route path="/payment/callback" element={
-                  <PrivateRoute>
-                    <PaymentCallback />
-                  </PrivateRoute>
-                } />
-                <Route path="/payment/checkout" element={
-                  <PrivateRoute>
-                    <PaymentForm />
-                  </PrivateRoute>
-                } />
-                <Route path="/payment/success" element={
-                  <PrivateRoute>
-                    <PaymentSuccess />
-                  </PrivateRoute>
-                } />
-
-                {/* Protected Admin Routes */}
-                <Route path="/admin" element={
-                  <PrivateRoute requiredRole="admin">
-                    <AdminLayout />
-                  </PrivateRoute>
-                }>
-                  <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="dashboard" element={<AnalyticsDashboard />} />
-                  <Route path="courses" element={<CourseManagement />} />
-                  <Route path="tests" element={<TestManagement />} />
-                  <Route path="users" element={<UserManagement />} />
-                  <Route path="payments" element={<PaymentManagement />} />
-                  <Route path="certificates" element={<CertificateManagement />} />
-                </Route>
-
-                {/* 404 Route */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </main>
+                    {/* 404 Route */}
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </main>
+              } />
+            </Routes>
             <CookieConsent />
             <Footer />
           </div>
