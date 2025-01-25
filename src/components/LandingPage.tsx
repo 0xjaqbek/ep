@@ -41,16 +41,17 @@ const LandingPage = () => {
   }
 
   return (
-    <main className="relative">
+    <div className="relative min-h-screen flex flex-col bg-black">
       <div 
-        className="absolute inset-0 w-full h-screen z-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
+        className="absolute inset-0 w-full h-full bg-center bg-cover bg-no-repeat transition-all duration-1000"
         style={{
           backgroundImage: `url(${backgroundImages[currentIndex]})`,
-          filter: 'blur(5px) brightness(0.4)'
+          filter: 'blur(5px) brightness(0.4)',
+          minHeight: '100vh'
         }}
       />
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 text-center text-white">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center text-white">
         <img
           src={logoEP}
           alt="EP Logo"
@@ -88,7 +89,7 @@ const LandingPage = () => {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 
