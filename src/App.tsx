@@ -34,6 +34,10 @@ import CookieConsent from './components/Common/CookieConsent.tsx';
 import { UserAccount } from './components/User/UserAccount.tsx';
 import { Footer } from './components/Layout/Footer.tsx';
 
+import About from './components/About.tsx';
+import Contact from './components/Contact.tsx';
+import Regulations from './components/Regulations.tsx';
+
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
     <h1 className="text-2xl font-bold mb-4">404 - Strona nie znaleziona</h1>
@@ -75,6 +79,9 @@ const App: React.FC = () => {
                     <Route path="register" element={<Register />} />
                     <Route path="unauthorized" element={<UnauthorizedPage />} />
                     <Route path="courses" element={<CourseList />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="contact" element={<Contact />} />
+                    <Route path="regulations" element={<Regulations />} />
                     
                     {/* Protected User Routes */}
                     <Route path="account" element={
