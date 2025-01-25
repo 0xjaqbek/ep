@@ -267,10 +267,16 @@ export const CourseList: React.FC = () => {
                 <h3 className="text-xl font-bold mb-2">{course.title}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="mr-2">⏱</span>
-                    <span>Czas trwania: {course.duration} min</span>
-                  </div>
+                <div className="space-y-1 text-sm text-gray-500">
+                 <div className="flex items-center">
+                   <span className="mr-2">⏱</span>
+                   <span>Czas trwania: {course.duration} min</span>
+                 </div>
+                 <div className="flex items-center">
+                   <span className="mr-2">🎯</span>
+                   <span>Punkty: {course.points || 5}</span>
+                 </div>
+               </div>
                   <div className="flex justify-between items-center pt-4 border-t">
                     <span className="text-2xl font-bold text-blue-600">{course.price} PLN</span>
                     <div className="flex flex-col items-end">

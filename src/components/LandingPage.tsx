@@ -65,7 +65,7 @@ const LandingPage = () => {
           <p className="text-sm font-light text-gray-200">
             Twoja wiedza, ich życie
           </p>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm font-bold text-gray-300">
             –rozwijaj się z nami.
           </p>
         </div>

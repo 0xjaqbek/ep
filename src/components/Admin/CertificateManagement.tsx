@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, getDocs, doc, updateDoc, deleteDoc, addDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
+import { Timestamp } from 'firebase/firestore';
 
 interface Certificate {
   id: string;
@@ -172,8 +173,8 @@ export const CertificateManagement: React.FC = () => {
             {filteredCertificates.map((cert) => (
               <tr key={cert.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {cert.completionDate instanceof Date 
-                    ? cert.completionDate.toLocaleDateString()
+                  {cert.completionDate instanceof Timestamp 
+                    ? cert.completionDate.toDate().toLocaleDateString()
                     : new Date(cert.completionDate).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

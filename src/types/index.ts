@@ -37,6 +37,7 @@ export interface Course {
   description: string;
   price: number;
   duration: number;
+  points: number; // New field
   videoUrl?: string;
   thumbnail?: string;
   testQuestions?: TestQuestion[];
@@ -53,10 +54,14 @@ export interface TestQuestion {
 }
 
 export interface Certificate {
+  id: string;
   userId: string;
   courseId: string;
   certificateNumber: string;
-  createdAt: Timestamp;
+  createdAt: Timestamp;  // Changed from Date to Timestamp
+  score: number;
   pdfUrl: string;
-  status: 'active' | 'revoked';
+  status: 'active' | 'revoked' | 'replaced';
+  revokedAt?: Timestamp;      // Changed from Date to Timestamp
+  replacedAt?: Timestamp;     // Changed from Date to Timestamp
 }
