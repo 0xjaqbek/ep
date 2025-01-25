@@ -1,16 +1,58 @@
 import React, { useState } from 'react';
+import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config.ts';
+import { useAuth } from './Auth/AuthProvider.tsx';
 
 const Contact = () => {
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: currentUser?.displayName || '',
+    email: currentUser?.email || '',
     subject: '',
     message: ''
   });
+  const [status, setStatus] = useState<{type: 'success' | 'error' | null, message: string}>({
+    type: null,
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    setIsSubmitting(true);
+    setStatus({ type: null, message: '' });
+
+    try {
+      const contactData = {
+        ...formData,
+        userId: currentUser?.uid || null,
+        createdAt: serverTimestamp(),
+        status: 'new'
+      };
+
+      await addDoc(collection(db, 'contact_messages'), contactData);
+
+      setStatus({
+        type: 'success',
+        message: 'Wiadomość została wysłana. Odpowiemy najszybciej jak to możliwe.'
+      });
+
+      // Reset form
+      setFormData(prev => ({
+        ...prev,
+        subject: '',
+        message: ''
+      }));
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setStatus({
+        type: 'error',
+        message: 'Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie później.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -30,6 +72,14 @@ const Contact = () => {
 
         <div>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {status.type && (
+              <div className={`p-4 rounded ${
+                status.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+              }`}>
+                {status.message}
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium mb-1">Imię i nazwisko</label>
               <input
@@ -38,6 +88,7 @@ const Contact = () => {
                 value={formData.name}
                 onChange={e => setFormData({...formData, name: e.target.value})}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -49,6 +100,7 @@ const Contact = () => {
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -60,6 +112,7 @@ const Contact = () => {
                 value={formData.subject}
                 onChange={e => setFormData({...formData, subject: e.target.value})}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -71,14 +124,16 @@ const Contact = () => {
                 value={formData.message}
                 onChange={e => setFormData({...formData, message: e.target.value})}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+              disabled={isSubmitting}
+              className={`w-full bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed`}
             >
-              Wyślij wiadomość
+              {isSubmitting ? 'Wysyłanie...' : 'Wyślij wiadomość'}
             </button>
           </form>
         </div>
