@@ -55,12 +55,20 @@ const LandingPage = () => {
         <img
           src={logoEP}
           alt="EP Logo"
-          className="w-64 h-auto mb-8"
+          className="w-64 h-auto mb-1"
         />
 
-        <h1 className="text-4xl font-bold mb-6">
-          Progres999
-        </h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold text-white leading-tight mb-1">
+            Progres<span className="text-white">999</span>
+          </h1>
+          <p className="text-sm font-light text-gray-200">
+            Twoja wiedza, ich życie
+          </p>
+          <p className="text-sm text-gray-300">
+            –rozwijaj się z nami.
+          </p>
+        </div>
 
         <div className="max-w-2xl mb-12 space-y-4 text-lg">
           <p>Witamy na platformie edukacyjnej dedykowanej ratownikom medycznym, 
