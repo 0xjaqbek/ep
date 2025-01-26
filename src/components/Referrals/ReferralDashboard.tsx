@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
@@ -10,7 +10,11 @@ export const ReferralDashboard: React.FC = () => {
   const [referredUsers, setReferredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const referralLink = `${window.location.origin}/register?ref=${currentUser?.referralCode}`;
+  
+  const referralLink = useMemo(() => {
+    if (!currentUser?.referralCode) return '';
+    return `${window.location.origin}/register?ref=${currentUser.referralCode}`;
+  }, [currentUser?.referralCode]);
 
   const fetchReferredUsers = async () => {
     if (!currentUser?.referralCode) return;
@@ -21,8 +25,7 @@ export const ReferralDashboard: React.FC = () => {
       const q = query(
         usersRef, 
         where('referredBy', '==', currentUser.referralCode),
-        orderBy('createdAt', 'desc'),
-        limit(50)
+        orderBy('createdAt', 'desc')
       );
       
       const snapshot = await getDocs(q);
@@ -45,6 +48,7 @@ export const ReferralDashboard: React.FC = () => {
 
   const copyToClipboard = async () => {
     try {
+      if (!referralLink) return;
       await navigator.clipboard.writeText(referralLink);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);

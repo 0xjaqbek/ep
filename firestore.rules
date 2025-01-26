@@ -8,12 +8,14 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      allow read: if true; // Publicly readable
+      allow read: if true;
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && 
-        (request.auth.uid == userId || isAdmin()) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['referralPoints', 'referrals']) &&
-        request.resource.data.referredBy == resource.data.referredBy;
+      allow update: if request.auth != null && (
+        request.auth.uid == userId || 
+        // Allow updating referral fields
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['referralPoints', 'referrals']) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.referralCode == resource.data.referredBy)
+      );
     }
 
     // Courses collection

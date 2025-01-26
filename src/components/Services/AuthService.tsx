@@ -14,9 +14,16 @@ import {
     doc, 
     setDoc, 
     getDoc, 
-    serverTimestamp 
+    serverTimestamp, 
+    query,
+    collection,
+    where,
+    getDocs,
+    updateDoc,
+    QueryDocumentSnapshot,
+    DocumentData
   } from 'firebase/firestore';
-  
+  import { increment, arrayUnion } from 'firebase/firestore';
   export class AuthService {
     private googleProvider: GoogleAuthProvider;
   
@@ -48,12 +55,28 @@ import {
       try {
         const result = await signInWithPopup(auth, this.googleProvider);
         const user = result.user;
-    
         const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
     
+        const urlParams = new URLSearchParams(window.location.search);
+        const referralCode = urlParams.get('ref');
+        let referralPoints = 0;
+        let referredBy: string | null = null;
+        let referrerDoc: QueryDocumentSnapshot<DocumentData> | undefined;
+    
+        if (referralCode) {
+          const referrerQuery = query(collection(db, 'users'), where('referralCode', '==', referralCode));
+          const referrerSnapshot = await getDocs(referrerQuery);
+          
+          if (!referrerSnapshot.empty) {
+            referralPoints = 1;
+            referredBy = referralCode;
+            referrerDoc = referrerSnapshot.docs[0];
+          }
+        }
+    
         if (!userDoc.exists()) {
-          await setDoc(userRef, {
+          const newUserData = {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName || 'User',
@@ -69,13 +92,22 @@ import {
             completedCourses: [],
             createdAt: serverTimestamp(),
             referralCode: this.generateReferralCode(user.uid),
-            referredBy: null,
-            referralPoints: 0,
+            referredBy,
+            referralPoints,
             referrals: []
-          });
+          };
+    
+          await setDoc(userRef, newUserData);
+    
+          if (referredBy && referrerDoc) {
+            await updateDoc(doc(db, 'users', referrerDoc.id), {
+              referralPoints: increment(1),
+              referrals: arrayUnion(user.uid)
+            });
+          }
         }
     
-        return result; // Return the auth result
+        return result;
       } catch (error) {
         console.error('Google sign in error:', error);
         throw error;
