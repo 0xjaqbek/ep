@@ -10,12 +10,15 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if true;
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && (
-        request.auth.uid == userId || 
-        // Allow updating referral fields
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['referralPoints', 'referrals']) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.referralCode == resource.data.referredBy)
-      );
+      allow update: if request.auth != null &&
+        (request.auth.uid == userId ||
+        // Validate referral logic
+        (resource.data.referredBy != null &&
+        request.resource.data.referredBy == resource.data.referredBy &&
+        exists(/databases/$(database)/documents/users/$(resource.data.referredBy)) &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['referralPoints', 'referrals'])));
+
     }
 
     // Courses collection

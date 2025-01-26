@@ -39,7 +39,9 @@ import {
       const random = Array(4).fill(0)
         .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
         .join('');
-      return `${prefix}${random}`;
+      const referralCode = `${prefix}${random}`;
+      console.log('Generated Referral Code:', referralCode);
+      return referralCode;
     }
   
     async login(email: string, password: string) {

@@ -44,6 +44,7 @@ export const Register: React.FC = () => {
 
   useEffect(() => {
     const validateReferralCode = async () => {
+      console.log('Current referral code:', formData.referralCode);
       if (!formData.referralCode) {
         setReferralValid(null);
         return;
@@ -52,14 +53,14 @@ export const Register: React.FC = () => {
       try {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('referralCode', '==', formData.referralCode));
-        const snapshot = await getDocs(q);
-        setReferralValid(!snapshot.empty);
+        const querySnapshot = await getDocs(q);
+        setReferralValid(!querySnapshot.empty);
       } catch (error) {
         console.error('Error validating referral:', error);
         setReferralValid(false);
       }
     };
-
+  
     validateReferralCode();
   }, [formData.referralCode]);
 
