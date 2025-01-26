@@ -40,6 +40,7 @@ import { ReferralDashboard } from './components/Referrals/ReferralDashboard.tsx'
 import About from './components/About.tsx';
 import Contact from './components/Contact.tsx';
 import Regulations from './components/Regulations.tsx';
+import { Settings } from './components/Admin/Settings.tsx';
 
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
@@ -120,20 +121,21 @@ const App: React.FC = () => {
 
                     {/* Protected Admin Routes */}
                     <Route path="admin" element={
-                      <PrivateRoute requiredRole="admin">
-                        <AdminLayout />
-                      </PrivateRoute>
-                    }>
-                      <Route index element={<Navigate to="dashboard" replace />} />
-                      <Route path="dashboard" element={<AnalyticsDashboard />} />
-                      <Route path="courses" element={<CourseManagement />} />
-                      <Route path="tests" element={<TestManagement />} />
-                      <Route path="users" element={<UserManagement />} />
-                      <Route path="payments" element={<PaymentManagement />} />
-                      <Route path="certificates" element={<CertificateManagement />} />
-                      <Route path="messages" element={<MessagesManagement />} />
-                      <Route path="opinions" element={<OpinionsManagement />} />
-                    </Route>
+                <PrivateRoute requiredRole="admin">
+                  <AdminLayout />
+                </PrivateRoute>
+              }>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<AnalyticsDashboard />} />
+                <Route path="courses" element={<CourseManagement />} />
+                <Route path="tests" element={<TestManagement />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="payments" element={<PaymentManagement />} />
+                <Route path="certificates" element={<CertificateManagement />} />
+                <Route path="messages" element={<MessagesManagement />} />
+                <Route path="opinions" element={<OpinionsManagement />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
 
                     {/* 404 Route */}
                     <Route path="*" element={<NotFoundPage />} />

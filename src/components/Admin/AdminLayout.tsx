@@ -64,6 +64,12 @@ export const AdminLayout: React.FC = () => {
           >
             Opinie
           </Link>
+          <Link
+            to="/admin/settings"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/settings')}`}
+          >
+            Ustawienia
+          </Link>
         </nav>
       </aside>
 

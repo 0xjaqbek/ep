@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { db } from '../../firebase/config';
+import { db } from '../../firebase/config.ts';
 import { P24Service } from '../../services/payment/p24Service';
 
 export const PaymentCallback: React.FC = () => {
