@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { P24Service } from '../../services/payment/p24Service.ts';
-import { doc, updateDoc, arrayUnion, getDoc, increment, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, getDoc, increment, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config.ts';
 
 interface LocationState {
@@ -65,88 +65,69 @@ export const PaymentForm: React.FC = () => {
   };
   
 
-const handlePayment = async () => {
-  setLoading(true);
-  setError('');
-
-  try {
-    if (!currentUser?.uid) {
-      setError('Nie można zidentyfikować użytkownika');
-      setLoading(false);
-      return;
-    }
-
-    if (!state.courseId || !state.courseTitle) {
-      throw new Error("Course information is incomplete");
-    }
-
-    const p24Service = new P24Service();
-    const paymentData = {
-      courseId: state.courseId,
-      userId: currentUser.uid,
-      amount: state.coursePrice,
-      email: currentUser.email,
-      courseTitle: state.courseTitle, // Added courseTitle
-      customerData: {
-        firstName: currentUser.displayName.split(' ')[0] || '',
-        lastName: currentUser.displayName.split(' ')[1] || '',
-        phone: currentUser.phoneNumber,
-        address: currentUser.address.street,
-        postal: currentUser.address.postalCode,
-        city: currentUser.address.city,
-      },
-    };
-
-    const order = await p24Service.createOrder(paymentData);
-    window.location.href = order.payment_url;
-
-    // Referral logic
-    const handleReferralPoints = async () => {
+  const handlePayment = async () => {
+    setLoading(true);
+    setError('');
+  
+    try {
       if (!currentUser?.uid) {
-        console.error("User ID is undefined");
-        return; // Exit early if no user ID
+        throw new Error('Użytkownik nie jest zalogowany');
       }
-    
-      const userRef = doc(db, 'users', currentUser.uid); // This is now safe
-      const userSnapshot = await getDoc(userRef);
-    
-      if (userSnapshot.exists()) {
-        const userData = userSnapshot.data();
-    
-        // Check if user was referred and referral points are not rewarded
-        if (userData.referredBy && !userData.referralRewarded) {
-          const referrerId = userData.referredBy;
-    
-          if (!referrerId) {
-            console.error("Referrer ID is undefined");
-            return; // Exit early if no referrer ID
-          }
-    
-          const referrerRef = doc(db, 'users', referrerId); // Ensure referrerId is a valid string
-          await updateDoc(referrerRef, {
-            referralPoints: increment(10), // Add 10 points to referrer
+  
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+  
+      if (userData?.referredBy) {
+        // Find referrer
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('referralCode', '==', userData.referredBy));
+        const snapshot = await getDocs(q);
+  
+        if (!snapshot.empty) {
+          const referrerDoc = snapshot.docs[0];
+          
+          // Award points to referrer
+          await updateDoc(doc(db, 'users', referrerDoc.id), {
+            referralPoints: increment(10)
           });
-    
-          // Mark the referral as rewarded
+  
+          // Award points to the referred user (current user)
           await updateDoc(userRef, {
-            referralRewarded: true,
+            referralPoints: increment(5)
           });
         }
-      } else {
-        console.error("User document does not exist in Firestore");
       }
-    };
-    
+  
+      const p24Service = new P24Service();
+      const paymentData = {
+        courseId: state.courseId,
+        userId: currentUser.uid,
+        amount: state.coursePrice,
+        email: currentUser.email,
+        courseTitle: state.courseTitle,
+        customerData: {
+          firstName: currentUser.displayName.split(' ')[0] || '',
+          lastName: currentUser.displayName.split(' ')[1] || '',
+          phone: currentUser.phoneNumber,
+          address: currentUser.address.street,
+          postal: currentUser.address.postalCode,
+          city: currentUser.address.city,
+        },
+      };
+  
+      const order = await p24Service.createOrder(paymentData);
+      window.location.href = order.payment_url;
+  
+    } catch (error) {
+      console.error('Payment error:', error);
+      setError('Wystąpił błąd podczas inicjowania płatności. Spróbuj ponownie.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    await handleReferralPoints();
-  } catch (error) {
-    setError('Wystąpił błąd podczas inicjowania płatności. Spróbuj ponownie.');
-    console.error('Payment error:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+// Updated handleSimulatePayment
 const handleSimulatePayment = async () => {
   setLoading(true);
   try {
@@ -154,37 +135,40 @@ const handleSimulatePayment = async () => {
       throw new Error("User is not authenticated");
     }
 
-    if (!state.courseId || !state.courseTitle) {
-      throw new Error("Course information is incomplete");
-    }
-
     const userRef = doc(db, 'users', auth.currentUser.uid);
     const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
 
+    // First update purchased courses
     await updateDoc(userRef, {
-      purchasedCourses: arrayUnion(state.courseId),
+      purchasedCourses: arrayUnion(state.courseId)
     });
 
-    const handleReferralPoints = async () => {
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
+    // Handle referral points if applicable
+    if (userData?.referredBy) {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('referralCode', '==', userData.referredBy));
+      const referrerSnapshot = await getDocs(q);
 
-        if (userData.referredBy && !userData.referralRewarded) {
-          const referrerId = userData.referredBy;
-          const referrerRef = doc(db, 'users', referrerId);
+      if (!referrerSnapshot.empty) {
+        const referrerDoc = referrerSnapshot.docs[0];
+        
+        // Single batch write for both updates
+        const batch = writeBatch(db);
+        
+        // Update referrer points
+        batch.update(doc(db, 'users', referrerDoc.id), {
+          referralPoints: increment(10)
+        });
+        
+        // Update current user points
+        batch.update(userRef, {
+          referralPoints: increment(5)
+        });
 
-          await updateDoc(referrerRef, {
-            referralPoints: increment(10),
-          });
-
-          await updateDoc(userRef, {
-            referralRewarded: true,
-          });
-        }
+        await batch.commit();
       }
-    };
-
-    await handleReferralPoints();
+    }
 
     navigate('/payment/success', {
       state: {
@@ -193,7 +177,7 @@ const handleSimulatePayment = async () => {
       },
     });
   } catch (error) {
-    console.error('Pełny błąd:', error);
+    console.error('Payment error:', error);
     setError('Wystąpił błąd podczas symulacji płatności.');
   } finally {
     setLoading(false);

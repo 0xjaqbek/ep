@@ -277,7 +277,7 @@ export const CourseList: React.FC = () => {
                  </div>
                  <div className="flex items-center">
                    <span className="mr-2">🎯</span>
-                   <span>Punkty: {course.points || 5}</span>
+                   <span>Punkty edykacyjne: {course.points || 5}</span>
                  </div>
                </div>
                   <div className="flex justify-between items-center pt-4 border-t">

@@ -90,17 +90,19 @@ export const Register: React.FC = () => {
           const referrer = snapshot.docs[0];
           await updateDoc(doc(db, 'users', referrer.id), {
             referralPoints: increment(1),
-            referrals: arrayUnion(auth.currentUser.uid), // Add the new user's UID to the referrer's referrals
+            referrals: arrayUnion(auth.currentUser.uid),
           });
 
           await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-            referralPoints: 1, // Reward the referred user
+            referralPoints: 1,
             referredBy: formData.referralCode,
           });
         }
       }
 
+      // Redirect to courses page
       navigate('/courses');
+      
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error during Google sign up');
       setLoading(false);
@@ -133,17 +135,9 @@ export const Register: React.FC = () => {
         const snapshot = await getDocs(q);
       
         if (!snapshot.empty) {
-          const referrer = snapshot.docs[0];
-      
-          // Save who referred the user but do not give points yet
           referredBy = formData.referralCode;
-      
-          await updateDoc(doc(db, 'users', referrer.id), {
-            referrals: arrayUnion(userCredential.user.uid), // Track the referred user
-          });
         }
       }
-      
 
       // Create the new user document
       await setDoc(doc(db, 'users', userCredential.user.uid), {
@@ -166,10 +160,12 @@ export const Register: React.FC = () => {
         referralCode,
         referredBy,
         referralPoints,
-        referrals: [], // Initialize empty referrals list
+        referrals: [],
       });
 
+      // Redirect to courses page
       navigate('/courses');
+      
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {
