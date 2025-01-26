@@ -18,9 +18,11 @@ service cloud.firestore {
           'createdAt',
           'referralCode'
         ]);
-      allow update: if request.auth != null && 
-        (request.auth.uid == userId ||
-         request.auth.token.role == 'admin');
+  allow update: if request.auth != null && 
+    (
+      (request.auth.uid == userId && request.resource.data.hasPurchased == true && resource.data.referredBy != null) || 
+      request.auth.token.role == 'admin'
+    );
     }
 
     // Courses collection

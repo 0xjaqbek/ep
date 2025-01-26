@@ -1,4 +1,3 @@
-// src/components/Auth/Register.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
@@ -27,57 +26,52 @@ export const Register: React.FC = () => {
     additionalInfo: '',
     gdprConsent: false,
     marketingConsent: false,
-    referralCode: searchParams.get('ref') || ''
+    referralCode: searchParams.get('ref') || '', // Get referral code from URL params
   });
-  
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Generate a unique referral code for the user
   const generateReferralCode = (uid: string): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const prefix = uid.substring(0, 3).toUpperCase();
-    const random = Array(4).fill(0)
+    const random = Array(4)
+      .fill(0)
       .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
       .join('');
     return `${prefix}${random}`;
   };
 
+  // Validate Referral Code
   useEffect(() => {
     const validateReferralCode = async () => {
       if (!formData.referralCode) {
-        setReferralValid(null);
+        setReferralValid(null); // No referral code provided
         return;
       }
-  
+
       try {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('referralCode', '==', formData.referralCode));
         const querySnapshot = await getDocs(q);
-        console.log('Query snapshot size:', querySnapshot.size);
-        console.log('Referral docs:', querySnapshot.docs.map(doc => doc.data()));
-        setReferralValid(!querySnapshot.empty);
+        setReferralValid(!querySnapshot.empty); // Check if the referral code exists
       } catch (error) {
-        console.error('Referral validation full error:', error);
-        // Log specific error details
-        if (error instanceof Error) {
-          console.error('Error name:', error.name);
-          console.error('Error message:', error.message);
-          console.error('Error code:', (error as any).code);
-        }
+        console.error('Error validating referral code:', error);
         setReferralValid(false);
       }
     };
-  
+
     validateReferralCode();
   }, [formData.referralCode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -86,26 +80,26 @@ export const Register: React.FC = () => {
       setError('');
       setLoading(true);
       await loginWithGoogle();
-      
+
       if (formData.referralCode && auth.currentUser && referralValid) {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('referralCode', '==', formData.referralCode));
         const snapshot = await getDocs(q);
-  
+
         if (!snapshot.empty) {
           const referrer = snapshot.docs[0];
           await updateDoc(doc(db, 'users', referrer.id), {
             referralPoints: increment(1),
-            referrals: arrayUnion(auth.currentUser.uid)
+            referrals: arrayUnion(auth.currentUser.uid), // Add the new user's UID to the referrer's referrals
           });
-  
+
           await updateDoc(doc(db, 'users', auth.currentUser.uid), {
-            referralPoints: 1,
-            referredBy: formData.referralCode
+            referralPoints: 1, // Reward the referred user
+            referredBy: formData.referralCode,
           });
         }
       }
-      
+
       navigate('/courses');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error during Google sign up');
@@ -127,12 +121,8 @@ export const Register: React.FC = () => {
         throw new Error('Hasła nie są identyczne');
       }
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        formData.email, 
-        formData.password
-      );
-      
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+
       const referralCode = generateReferralCode(userCredential.user.uid);
       let referralPoints = 0;
       let referredBy: string | null = null;
@@ -141,19 +131,21 @@ export const Register: React.FC = () => {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('referralCode', '==', formData.referralCode));
         const snapshot = await getDocs(q);
-
+      
         if (!snapshot.empty) {
           const referrer = snapshot.docs[0];
-          await updateDoc(doc(db, 'users', referrer.id), {
-            referralPoints: increment(1),
-            referrals: arrayUnion(userCredential.user.uid)
-          });
-          
-          referralPoints = 1;
+      
+          // Save who referred the user but do not give points yet
           referredBy = formData.referralCode;
+      
+          await updateDoc(doc(db, 'users', referrer.id), {
+            referrals: arrayUnion(userCredential.user.uid), // Track the referred user
+          });
         }
       }
+      
 
+      // Create the new user document
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
         email: formData.email,
@@ -164,7 +156,7 @@ export const Register: React.FC = () => {
           street: formData.street,
           city: formData.city,
           postalCode: formData.postalCode,
-          country: formData.country
+          country: formData.country,
         },
         nip: formData.nip || null,
         additionalInfo: formData.additionalInfo,
@@ -174,11 +166,10 @@ export const Register: React.FC = () => {
         referralCode,
         referredBy,
         referralPoints,
-        referrals: []
+        referrals: [], // Initialize empty referrals list
       });
 
       navigate('/courses');
-
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {

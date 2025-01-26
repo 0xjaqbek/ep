@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 
 interface User {
+  referredBy: unknown;
   uid: string;
   email: string;
   displayName: string;
@@ -76,6 +77,7 @@ interface AnalyticsData {
     total: number;
     monthly: CertificateData[];
   };
+  referrals: number; // Add this property
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -147,6 +149,8 @@ export const AnalyticsDashboard: React.FC = () => {
         ...doc.data()
       })) as Certificate[];
 
+      const referrals = users.filter(user => user.referredBy).length; // Count referrals
+
       const analyticsData: AnalyticsData = {
         revenue: calculateRevenueData(payments),
         users: {
@@ -154,18 +158,20 @@ export const AnalyticsDashboard: React.FC = () => {
           active: users.filter(u => 
             u.lastLoginDate && u.lastLoginDate.toDate() >= startDate
           ).length,
-          new: calculateNewUsersData(users, startDate)
+          new: calculateNewUsersData(users, startDate),
         },
         courses: {
           total: courses.length,
           completion: calculateCourseCompletionData(courses),
-          popular: calculatePopularCourses(courses)
+          popular: calculatePopularCourses(courses),
         },
         certificates: {
           total: certificates.length,
-          monthly: calculateMonthlyCertificates(certificates)
-        }
+          monthly: calculateMonthlyCertificates(certificates),
+        },
+        referrals, // Add referrals to analytics
       };
+      
 
       setAnalytics(analyticsData);
     } catch (error) {
