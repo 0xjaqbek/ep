@@ -9,12 +9,9 @@ export const Header: React.FC = () => {
  const navigate = useNavigate();
  const location = useLocation();
  const [showUserMenu, setShowUserMenu] = useState(false);
-
-  // Add a ref to track the menu and button
-  const menuRef = React.useRef<HTMLDivElement>(null);
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+ const menuRef = React.useRef<HTMLDivElement>(null);
+ const buttonRef = React.useRef<HTMLButtonElement>(null);
  
-  // Handle clicks outside the menu
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -55,11 +52,7 @@ export const Header: React.FC = () => {
                 to="/" 
                 className="text-2xl font-extrabold text-blue-600 leading-tight"
               >
-                Progres<span 
-                  className="text-blue-800 inline-block"
-                >
-                  999
-                </span>
+                Progres<span className="text-blue-800 inline-block">999</span>
                 <p className="text-sm font-light text-gray-900">
                   Twoja wiedza, ich życie
                 </p>
@@ -113,6 +106,13 @@ export const Header: React.FC = () => {
                      onClick={() => setShowUserMenu(false)}
                    >
                      Moje kursy
+                   </Link>
+                   <Link
+                     to="/referrals"
+                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                     onClick={() => setShowUserMenu(false)}
+                   >
+                     Program poleceń
                    </Link>
                    {currentUser.role === 'admin' && (
                      <Link

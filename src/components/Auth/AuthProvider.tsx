@@ -7,6 +7,7 @@ import { db } from '../../firebase/config.ts';
 import { User } from '../../types';
 import { AuthService } from '../../components/Services/AuthService.tsx';
 import { LoadingSpinner } from '../Loading/LoadingSpinner.tsx';
+import { UserCredential } from 'firebase/auth';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -63,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<void> => {
     try {
       setLoading(true);
       await authService.login(email, password);
@@ -77,10 +78,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (): Promise<void> => {
     try {
       setLoading(true);
-      await authService.loginWithGoogle();
+      await authService.loginWithGoogle();  // Changed
       await refreshUserData();
       setError(null);
     } catch (error) {

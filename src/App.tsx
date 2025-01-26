@@ -35,6 +35,7 @@ import LandingPage from './components/LandingPage.tsx';
 import CookieConsent from './components/Common/CookieConsent.tsx';
 import { UserAccount } from './components/User/UserAccount.tsx';
 import { Footer } from './components/Layout/Footer.tsx';
+import { ReferralDashboard } from './components/Referrals/ReferralDashboard.tsx';
 
 import About from './components/About.tsx';
 import Contact from './components/Contact.tsx';
@@ -89,6 +90,11 @@ const App: React.FC = () => {
                     <Route path="account" element={
                       <PrivateRoute>
                         <UserAccount />
+                      </PrivateRoute>
+                    } />
+                    <Route path="referrals" element={
+                      <PrivateRoute>
+                        <ReferralDashboard />
                       </PrivateRoute>
                     } />
                     <Route path="course/:id/learn" element={

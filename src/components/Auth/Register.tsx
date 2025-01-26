@@ -1,11 +1,17 @@
+// src/components/Auth/Register.tsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { LoadingSpinner } from '../Loading/LoadingSpinner.tsx';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, collection, query, where, getDocs, updateDoc, arrayUnion } from 'firebase/firestore';
+import { auth, db } from '../../firebase/config.ts';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const { loginWithGoogle } = useAuth();
+  const [searchParams] = useSearchParams();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,10 +25,21 @@ export const Register: React.FC = () => {
     nip: '',
     additionalInfo: '',
     gdprConsent: false,
-    marketingConsent: false
+    marketingConsent: false,
+    referralCode: searchParams.get('ref') || ''
   });
+  
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const generateReferralCode = (uid: string): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const prefix = uid.substring(0, 3).toUpperCase();
+    const random = Array(4).fill(0)
+      .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+      .join('');
+    return `${prefix}${random}`;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -39,6 +56,28 @@ export const Register: React.FC = () => {
       setError('');
       setLoading(true);
       await loginWithGoogle();
+      
+      // Handle referral code if present
+      const refCode = searchParams.get('ref');
+      if (refCode && auth.currentUser) {  // Use auth.currentUser instead
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('referralCode', '==', refCode));
+        const snapshot = await getDocs(q);
+  
+        if (!snapshot.empty) {
+          const referrer = snapshot.docs[0];
+          await updateDoc(doc(db, 'users', referrer.id), {
+            referralPoints: (referrer.data().referralPoints || 0) + 1,
+            referrals: arrayUnion(auth.currentUser.uid)
+          });
+  
+          await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+            referralPoints: 1,
+            referredBy: refCode
+          });
+        }
+      }
+      
       navigate('/courses');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error during Google sign up');
@@ -64,7 +103,58 @@ export const Register: React.FC = () => {
     }
 
     try {
-      // ... rest of your existing registration logic ...
+      // Create auth user
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      
+      // Generate unique referral code
+      const referralCode = generateReferralCode(userCredential.user.uid);
+
+      // Handle referral points
+      let referralPoints = 0;
+      let referredBy: string | null = null;
+
+      // Check if referral code was provided
+      if (formData.referralCode) {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('referralCode', '==', formData.referralCode));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          const referrer = snapshot.docs[0];
+          // Update referrer's points and referrals
+          await updateDoc(doc(db, 'users', referrer.id), {
+            referralPoints: (referrer.data().referralPoints || 0) + 1,
+            referrals: arrayUnion(userCredential.user.uid)
+          });
+          referralPoints = 1; // New user gets 1 point for using a referral
+          referredBy = formData.referralCode;
+        }
+      }
+
+      // Create user document
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        email: formData.email,
+        displayName: formData.displayName,
+        role: 'student',
+        phoneNumber: formData.phoneNumber,
+        address: {
+          street: formData.street,
+          city: formData.city,
+          postalCode: formData.postalCode,
+          country: formData.country
+        },
+        nip: formData.nip || null,
+        additionalInfo: formData.additionalInfo,
+        purchasedCourses: [],
+        completedCourses: [],
+        createdAt: new Date(),
+        referralCode,
+        referredBy,
+        referralPoints,
+        referrals: []
+      });
+
       navigate('/courses');
     } catch (error) {
       if (error instanceof Error) {
@@ -142,7 +232,7 @@ export const Register: React.FC = () => {
           )}
 
           <div className="rounded-md shadow-sm space-y-4">
-            {/* Istniejące pola formularza */}
+            {/* Basic Info */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email *
@@ -218,20 +308,25 @@ export const Register: React.FC = () => {
               />
             </div>
 
+            {/* Referral Code */}
             <div>
-              <label htmlFor="nip" className="block text-sm font-medium text-gray-700">
-                NIP (opcjonalnie)
+              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">
+                Kod polecający (opcjonalnie)
               </label>
               <input
-                id="nip"
-                name="nip"
+                id="referralCode"
+                name="referralCode"
                 type="text"
-                value={formData.nip}
+                value={formData.referralCode}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              <p className="mt-1 text-sm text-gray-500">
+                Wpisz kod polecający, aby otrzymać punkt startowy
+              </p>
             </div>
 
+            {/* Address Fields */}
             <div>
               <label htmlFor="street" className="block text-sm font-medium text-gray-700">
                 Ulica i numer *
@@ -280,6 +375,20 @@ export const Register: React.FC = () => {
             </div>
 
             <div>
+              <label htmlFor="nip" className="block text-sm font-medium text-gray-700">
+                NIP (opcjonalnie)
+              </label>
+              <input
+                id="nip"
+                name="nip"
+                type="text"
+                value={formData.nip}
+                onChange={handleChange}
+className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
               <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700">
                 Dodatkowe informacje (opcjonalnie)
               </label>
@@ -293,7 +402,7 @@ export const Register: React.FC = () => {
               />
             </div>
 
-            {/* Zgody RODO */}
+            {/* Consents */}
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex items-center h-5">
@@ -314,7 +423,7 @@ export const Register: React.FC = () => {
                   <p className="text-gray-500">
                     Zgodnie z art. 13 ust. 1 i 2 RODO informujemy, że administratorem Twoich danych osobowych jest nasza firma. 
                     Dane będą przetwarzane w celu realizacji usług edukacyjnych. Masz prawo dostępu do swoich danych, ich sprostowania, 
-                    usunięcia lub ograniczenia przetwarzania. Więcej informacji znajdziesz w naszej Polityce Prywatności.
+                    usunięcia lub ograniczenia przetwarzania.
                   </p>
                 </div>
               </div>

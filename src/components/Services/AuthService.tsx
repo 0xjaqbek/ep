@@ -22,9 +22,17 @@ import {
   
     constructor() {
       this.googleProvider = new GoogleAuthProvider();
-      // Add additional scopes if needed
       this.googleProvider.addScope('email');
       this.googleProvider.addScope('profile');
+    }
+  
+    private generateReferralCode(uid: string): string {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const prefix = uid.substring(0, 3).toUpperCase();
+      const random = Array(4).fill(0)
+        .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+        .join('');
+      return `${prefix}${random}`;
     }
   
     async login(email: string, password: string) {
@@ -45,12 +53,11 @@ import {
         const userDoc = await getDoc(userRef);
     
         if (!userDoc.exists()) {
-          // Create new user document with default 'student' role
           await setDoc(userRef, {
             uid: user.uid,
             email: user.email,
             displayName: user.displayName || 'User',
-            role: 'student', // Default role
+            role: 'student',
             phoneNumber: user.phoneNumber || '',
             address: {
               street: '',
@@ -61,22 +68,17 @@ import {
             purchasedCourses: [],
             completedCourses: [],
             createdAt: serverTimestamp(),
-            lastLoginAt: serverTimestamp(),
-            provider: 'google'
+            referralCode: this.generateReferralCode(user.uid),
+            referredBy: null,
+            referralPoints: 0,
+            referrals: []
           });
-        } else {
-          // Preserve existing role when logging in
-          const existingUserData = userDoc.data();
-          await setDoc(userRef, {
-            lastLoginAt: serverTimestamp(),
-            role: existingUserData?.role || 'student' // Preserve existing role
-          }, { merge: true });
         }
     
-        return user;
-      } catch (error: any) {
+        return result; // Return the auth result
+      } catch (error) {
         console.error('Google sign in error:', error);
-        throw this.handleAuthError(error);
+        throw error;
       }
     }
   
@@ -131,3 +133,4 @@ import {
       return new Error(message);
     }
   }
+

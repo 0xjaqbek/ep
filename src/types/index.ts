@@ -1,4 +1,5 @@
 // File: src/types/index.ts
+import { UserCredential } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 // CompletedCourse interface for use in User interface
 export interface CompletedCourse {
@@ -29,6 +30,10 @@ export interface User {
   purchasedCourses: string[];
   completedCourses: CompletedCourse[];
   createdAt?: Date;
+  referralCode: string;
+  referredBy: string | null;
+  referralPoints: number;
+  referrals: string[];
 }
 
 export interface Course {
@@ -73,4 +78,15 @@ export interface RatingModalProps {
   courseName: string;
   userId: string;
   userName: string;
+}
+
+export interface AuthContextType {
+  currentUser: User | null;
+  loading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  refreshUserData: () => Promise<void>;
 }
