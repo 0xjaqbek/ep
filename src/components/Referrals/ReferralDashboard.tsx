@@ -17,23 +17,33 @@ export const ReferralDashboard: React.FC = () => {
   }, [currentUser?.referralCode]);
 
   const fetchReferredUsers = async () => {
-    if (!currentUser?.referralCode) return;
-
+    if (!currentUser?.referralCode) {
+      console.log('No referral code for current user');
+      return;
+    }
+  
     try {
-      setLoading(true);
       const usersRef = collection(db, 'users');
       const q = query(
         usersRef,
         where('referredBy', '==', currentUser.referralCode),
         orderBy('createdAt', 'desc')
       );
-
+  
       const snapshot = await getDocs(q);
+      
+      console.log('Referral code:', currentUser.referralCode);
+      console.log('Number of referred users:', snapshot.size);
+      
+      snapshot.docs.forEach(doc => {
+        console.log('Referred user data:', doc.data());
+      });
+  
       const users = snapshot.docs.map(doc => ({
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate(),
       })) as User[];
-
+  
       setReferredUsers(users);
     } catch (error) {
       console.error('Error fetching referred users:', error);
