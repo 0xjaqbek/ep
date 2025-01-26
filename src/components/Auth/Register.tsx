@@ -1,16 +1,17 @@
 // src/components/Auth/Register.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { LoadingSpinner } from '../Loading/LoadingSpinner.tsx';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, collection, query, where, getDocs, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs, updateDoc, arrayUnion, increment } from 'firebase/firestore';
 import { auth, db } from '../../firebase/config.ts';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const { loginWithGoogle } = useAuth();
   const [searchParams] = useSearchParams();
+  const [referralValid, setReferralValid] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -41,6 +42,27 @@ export const Register: React.FC = () => {
     return `${prefix}${random}`;
   };
 
+  useEffect(() => {
+    const validateReferralCode = async () => {
+      if (!formData.referralCode) {
+        setReferralValid(null);
+        return;
+      }
+
+      try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('referralCode', '==', formData.referralCode));
+        const snapshot = await getDocs(q);
+        setReferralValid(!snapshot.empty);
+      } catch (error) {
+        console.error('Error validating referral:', error);
+        setReferralValid(false);
+      }
+    };
+
+    validateReferralCode();
+  }, [formData.referralCode]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
@@ -57,23 +79,21 @@ export const Register: React.FC = () => {
       setLoading(true);
       await loginWithGoogle();
       
-      // Handle referral code if present
-      const refCode = searchParams.get('ref');
-      if (refCode && auth.currentUser) {  // Use auth.currentUser instead
+      if (formData.referralCode && auth.currentUser && referralValid) {
         const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('referralCode', '==', refCode));
+        const q = query(usersRef, where('referralCode', '==', formData.referralCode));
         const snapshot = await getDocs(q);
   
         if (!snapshot.empty) {
           const referrer = snapshot.docs[0];
           await updateDoc(doc(db, 'users', referrer.id), {
-            referralPoints: (referrer.data().referralPoints || 0) + 1,
+            referralPoints: increment(1),
             referrals: arrayUnion(auth.currentUser.uid)
           });
   
           await updateDoc(doc(db, 'users', auth.currentUser.uid), {
             referralPoints: 1,
-            referredBy: refCode
+            referredBy: formData.referralCode
           });
         }
       }
@@ -90,48 +110,42 @@ export const Register: React.FC = () => {
     setError('');
     setLoading(true);
 
-    if (!formData.gdprConsent) {
-      setError('Musisz wyrazić zgodę na przetwarzanie danych osobowych');
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Hasła nie są identyczne');
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Create auth user
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      
-      // Generate unique referral code
-      const referralCode = generateReferralCode(userCredential.user.uid);
+      if (!formData.gdprConsent) {
+        throw new Error('Musisz wyrazić zgodę na przetwarzanie danych osobowych');
+      }
 
-      // Handle referral points
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Hasła nie są identyczne');
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, 
+        formData.email, 
+        formData.password
+      );
+      
+      const referralCode = generateReferralCode(userCredential.user.uid);
       let referralPoints = 0;
       let referredBy: string | null = null;
 
-      // Check if referral code was provided
-      if (formData.referralCode) {
+      if (formData.referralCode && referralValid) {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('referralCode', '==', formData.referralCode));
         const snapshot = await getDocs(q);
 
         if (!snapshot.empty) {
           const referrer = snapshot.docs[0];
-          // Update referrer's points and referrals
           await updateDoc(doc(db, 'users', referrer.id), {
-            referralPoints: (referrer.data().referralPoints || 0) + 1,
+            referralPoints: increment(1),
             referrals: arrayUnion(userCredential.user.uid)
           });
-          referralPoints = 1; // New user gets 1 point for using a referral
+          
+          referralPoints = 1;
           referredBy = formData.referralCode;
         }
       }
 
-      // Create user document
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
         email: formData.email,
@@ -156,6 +170,7 @@ export const Register: React.FC = () => {
       });
 
       navigate('/courses');
+
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {
@@ -166,7 +181,7 @@ export const Register: React.FC = () => {
             setError('Hasło jest za słabe. Użyj minimum 6 znaków');
             break;
           default:
-            setError('Wystąpił błąd podczas rejestracji');
+            setError(error.message || 'Wystąpił błąd podczas rejestracji');
         }
       }
     } finally {
@@ -183,7 +198,6 @@ export const Register: React.FC = () => {
           </h2>
         </div>
 
-        {/* Google Sign Up Button */}
         <div className="flex flex-col items-center">
           <button
             onClick={handleGoogleSignUp}
@@ -225,14 +239,7 @@ export const Register: React.FC = () => {
         )}
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-
           <div className="rounded-md shadow-sm space-y-4">
-            {/* Basic Info */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email *
@@ -308,7 +315,6 @@ export const Register: React.FC = () => {
               />
             </div>
 
-            {/* Referral Code */}
             <div>
               <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">
                 Kod polecający (opcjonalnie)
@@ -319,14 +325,27 @@ export const Register: React.FC = () => {
                 type="text"
                 value={formData.referralCode}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={`mt-1 block w-full px-3 py-2 border ${
+                  referralValid === true ? 'border-green-500' : 
+                  referralValid === false ? 'border-red-500' : 
+                  'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
               />
+              {referralValid === false && (
+                <p className="mt-1 text-sm text-red-600">
+                  Nieprawidłowy kod polecający
+                </p>
+              )}
+              {referralValid === true && (
+                <p className="mt-1 text-sm text-green-600">
+                  Poprawny kod polecający
+                </p>
+              )}
               <p className="mt-1 text-sm text-gray-500">
                 Wpisz kod polecający, aby otrzymać punkt startowy
               </p>
             </div>
 
-            {/* Address Fields */}
             <div>
               <label htmlFor="street" className="block text-sm font-medium text-gray-700">
                 Ulica i numer *

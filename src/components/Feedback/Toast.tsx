@@ -40,8 +40,15 @@ export const Toast: React.FC<ToastProps> = ({
     info: 'bg-blue-500 text-white'
   };
 
+  const typeIcons = {
+    success: '✓',
+    error: '✕',
+    info: 'ℹ'
+  };
+
   return (
-    <div className={`${baseClasses} ${typeClasses[type]}`}>
+    <div className={`${baseClasses} ${typeClasses[type]} flex items-center gap-2`}>
+      <span>{typeIcons[type]}</span>
       {message}
     </div>
   );
