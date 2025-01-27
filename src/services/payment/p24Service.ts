@@ -7,9 +7,13 @@ const WC_CONSUMER_SECRET = process.env.REACT_APP_WC_CONSUMER_SECRET;
 
 export interface P24PaymentData {
   courseId: string;
-  courseTitle: string;  // Added this field
+  courseTitle: string;
   userId: string;
   amount: number;
+  originalPrice: number;
+  finalPrice: number;
+  discountCode?: string;
+  discountAmount?: number;
   email: string;
   customerData: {
     firstName: string;
@@ -52,8 +56,10 @@ export class P24Service {
         line_items: [
           {
             name: `Kurs: ${paymentData.courseTitle}`,
-            price: paymentData.amount,
-            quantity: 1
+            price: paymentData.originalPrice,
+            quantity: 1,
+            subtotal: paymentData.originalPrice.toString(),
+            total: paymentData.finalPrice.toString(),
           }
         ],
         meta_data: [
@@ -68,10 +74,32 @@ export class P24Service {
           {
             key: 'userId',
             value: paymentData.userId
+          },
+          {
+            key: 'originalPrice',
+            value: paymentData.originalPrice.toString()
+          },
+          {
+            key: 'finalPrice',
+            value: paymentData.finalPrice.toString()
           }
         ]
       };
-
+  
+      // Add discount information if present
+      if (paymentData.discountCode) {
+        orderData.meta_data.push(
+          {
+            key: 'discountCode',
+            value: paymentData.discountCode
+          },
+          {
+            key: 'discountAmount',
+            value: paymentData.discountAmount?.toString() || '0'
+          }
+        );
+      }
+  
       if (paymentData.invoiceData) {
         orderData.meta_data.push(
           {
@@ -88,13 +116,13 @@ export class P24Service {
           }
         );
       }
-
+  
       const response = await axios.post(
         `${WOOCOMMERCE_API_URL}/orders`,
         orderData,
         { headers: this.getAuthHeaders() }
       );
-
+  
       return response.data;
     } catch (error) {
       console.error('Error creating WooCommerce order:', error);

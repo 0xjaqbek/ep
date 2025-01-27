@@ -47,6 +47,12 @@ export const AdminLayout: React.FC = () => {
             Płatności
           </Link>
           <Link
+            to="/admin/discounts"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/discounts')}`}
+          >
+            Kody rabatowe
+          </Link>
+          <Link
             to="/admin/certificates"
             className={`block p-4 hover:bg-blue-700 ${isActive('/admin/certificates')}`}
           >

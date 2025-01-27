@@ -90,3 +90,31 @@ export interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   refreshUserData: () => Promise<void>;
 }
+
+export interface DiscountCode {
+  id: string;
+  code: string;
+  discountPercent: number;
+  validFrom: Date;
+  validTo: Date | null;
+  maxUses: number | null;
+  currentUses: number;
+  isActive: boolean;
+}
+
+// Update Payment interface
+export interface Payment {
+  id: string;
+  userId: string;
+  courseId: string;
+  amount: number;
+  originalPrice: number;
+  finalPrice: number;
+  discountCode?: string;
+  discountAmount?: number;
+  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  paymentDate: Date;
+  userEmail: string;
+  courseName: string;
+  transactionId: string;
+}

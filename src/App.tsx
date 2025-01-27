@@ -41,6 +41,7 @@ import About from './components/About.tsx';
 import Contact from './components/Contact.tsx';
 import Regulations from './components/Regulations.tsx';
 import { Settings } from './components/Admin/Settings.tsx';
+import { DiscountManagement } from './components/Admin/DiscountManagement.tsx';
 
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
@@ -135,6 +136,7 @@ const App: React.FC = () => {
                 <Route path="messages" element={<MessagesManagement />} />
                 <Route path="opinions" element={<OpinionsManagement />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="discounts" element={<DiscountManagement />} />
               </Route>
 
                     {/* 404 Route */}
