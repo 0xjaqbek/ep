@@ -108,13 +108,43 @@ export interface Payment {
   userId: string;
   courseId: string;
   amount: number;
-  originalPrice: number;
-  finalPrice: number;
-  discountCode?: string;
-  discountAmount?: number;
   status: 'completed' | 'pending' | 'failed' | 'refunded';
   paymentDate: Date;
   userEmail: string;
   courseName: string;
   transactionId: string;
+  invoiceIssued?: boolean;
+  invoiceIssuedAt?: Date;
+  invoiceNumber?: string;
+  invoiceUrl?: string;
+  originalPrice?: number;
+  finalPrice?: number;
+  discountCode?: string;
+  discountAmount?: number;
+}
+
+export interface InvoiceRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  courseIds: string[];
+  courseTitles: string[];
+  totalAmount: number;
+  status: 'pending' | 'processed' | 'rejected';
+  createdAt: Date;
+  processedAt?: Date;
+  rejectedAt?: Date;
+  invoiceData: {
+    companyName: string;
+    nip: string;
+    companyAddress: string;
+  };
+  invoiceNumber?: string;
+  invoiceUrl?: string;
+  comment?: string;
+}
+
+export interface InvoiceCounter {
+  currentNumber: number;
 }

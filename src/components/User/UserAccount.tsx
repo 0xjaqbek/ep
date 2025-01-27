@@ -6,6 +6,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { LoadingSpinner } from '../Loading/LoadingSpinner.tsx';
+import { InvoiceRequest } from './InvoiceRequest.tsx';
 
 export const UserAccount: React.FC = () => {
   const { currentUser, refreshUserData } = useAuth();
@@ -270,6 +271,10 @@ export const UserAccount: React.FC = () => {
                     />
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-8">
+                <InvoiceRequest />
               </div>
 
               <div className="pt-6">

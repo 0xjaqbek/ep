@@ -53,6 +53,12 @@ export const AdminLayout: React.FC = () => {
             Kody rabatowe
           </Link>
           <Link
+            to="/admin/invoices"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/invoices')}`}
+          >
+            Faktury
+          </Link>
+          <Link
             to="/admin/certificates"
             className={`block p-4 hover:bg-blue-700 ${isActive('/admin/certificates')}`}
           >

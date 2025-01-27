@@ -15,6 +15,7 @@ import { CourseManagement } from './components/Admin/CourseManagement.tsx';
 import { UserManagement } from './components/Admin/UserManagement.tsx';
 import { MessagesManagement } from './components/Admin/MessagesManagement.tsx';
 import { OpinionsManagement } from './components/Admin/OpinionsManagement.tsx';
+import { InvoiceManagement } from './components/Admin/InvoiceManagement.tsx';
 
 // Auth Components
 import { Login } from './components/Auth/Login.tsx';
@@ -137,6 +138,7 @@ const App: React.FC = () => {
                 <Route path="opinions" element={<OpinionsManagement />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="discounts" element={<DiscountManagement />} />
+                <Route path="invoices" element={<InvoiceManagement />} />
               </Route>
 
                     {/* 404 Route */}
