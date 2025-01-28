@@ -85,14 +85,39 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 export const AnalyticsDashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
 
   useEffect(() => {
     fetchAnalytics();
   }, [timeRange]);
 
+      // Add these helper functions
+    const isValidFirestoreTimestamp = (timestamp: any): boolean => {
+      return timestamp && 
+            typeof timestamp === 'object' && 
+            'toDate' in timestamp && 
+            typeof timestamp.toDate === 'function';
+    };
+
+    const safeToDate = (timestamp: any): Date | null => {
+      if (!isValidFirestoreTimestamp(timestamp)) {
+        return null;
+      }
+      try {
+        const date = timestamp.toDate();
+        return isNaN(date.getTime()) ? null : date;
+      } catch (err) {
+        console.warn('Error converting timestamp to date:', err);
+        return null;
+      }
+    };
+
   const fetchAnalytics = async () => {
+    console.log('Fetching analytics data...'); // Debug log
     try {
+      setLoading(true);
+      setError(null);
       const now = Timestamp.now();
       const startDate = new Date();
       let startTimestamp: Timestamp;
@@ -100,19 +125,19 @@ export const AnalyticsDashboard: React.FC = () => {
       switch (timeRange) {
         case 'week':
           startDate.setDate(startDate.getDate() - 7);
-          startTimestamp = Timestamp.fromDate(startDate);
           break;
         case 'month':
           startDate.setMonth(startDate.getMonth() - 1);
-          startTimestamp = Timestamp.fromDate(startDate);
           break;
         case 'year':
           startDate.setFullYear(startDate.getFullYear() - 1);
-          startTimestamp = Timestamp.fromDate(startDate);
           break;
       }
+      startTimestamp = Timestamp.fromDate(startDate);
+      console.log('Start date:', startDate.toISOString()); // Debug log
 
-      // Fetch payments
+      // Fetch payments with error handling
+      console.log('Fetching payments...'); // Debug log
       const paymentsRef = collection(db, 'payments');
       const paymentsQuery = query(
         paymentsRef,
@@ -120,39 +145,61 @@ export const AnalyticsDashboard: React.FC = () => {
         orderBy('createdAt', 'desc')
       );
       const paymentsSnapshot = await getDocs(paymentsQuery);
-      const payments = paymentsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Payment[];
+      const payments = paymentsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        // Validate required fields
+        if (!data.createdAt || !data.amount || !data.status) {
+          console.warn(`Payment document ${doc.id} is missing required fields`);
+          return null;
+        }
+        return {
+          id: doc.id,
+          amount: data.amount,
+          status: data.status,
+          createdAt: data.createdAt,
+        } as Payment;
+      }).filter((payment): payment is Payment => payment !== null);
+      console.log('Payments fetched:', payments.length); // Debug log
 
-      // Fetch users
+      // Fetch users with error handling
+      console.log('Fetching users...'); // Debug log
       const usersRef = collection(db, 'users');
       const usersSnapshot = await getDocs(usersRef);
       const users = usersSnapshot.docs.map(doc => ({
         uid: doc.id,
         ...doc.data()
       })) as User[];
+      console.log('Users fetched:', users.length); // Debug log
 
-      // Fetch courses
+      // Fetch courses with error handling
+      console.log('Fetching courses...'); // Debug log
       const coursesRef = collection(db, 'courses');
       const coursesSnapshot = await getDocs(coursesRef);
       const courses = coursesSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Course[];
+      console.log('Courses fetched:', courses.length); // Debug log
 
-      // Fetch certificates
+      // Fetch certificates with error handling
+      console.log('Fetching certificates...'); // Debug log
       const certificatesRef = collection(db, 'certificates');
       const certificatesSnapshot = await getDocs(certificatesRef);
       const certificates = certificatesSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Certificate[];
+      console.log('Certificates fetched:', certificates.length); // Debug log
 
-      const referrals = users.filter(user => user.referredBy).length; // Count referrals
+      const referrals = users.filter(user => user.referredBy).length;
+      console.log('Referrals count:', referrals); // Debug log
+
+      // Calculate analytics data
+      const revenueData = calculateRevenueData(payments);
+      console.log('Revenue data calculated:', revenueData); // Debug log
 
       const analyticsData: AnalyticsData = {
-        revenue: calculateRevenueData(payments),
+        revenue: revenueData,
         users: {
           total: users.length,
           active: users.filter(u => 
@@ -169,13 +216,15 @@ export const AnalyticsDashboard: React.FC = () => {
           total: certificates.length,
           monthly: calculateMonthlyCertificates(certificates),
         },
-        referrals, // Add referrals to analytics
+        referrals,
       };
-      
 
+      console.log('Setting analytics data:', analyticsData); // Debug log
       setAnalytics(analyticsData);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch analytics data';
+      console.error('Error fetching analytics:', err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -185,14 +234,19 @@ export const AnalyticsDashboard: React.FC = () => {
     const daily: RevenueData[] = [];
     const monthly: RevenueData[] = [];
     let total = 0;
-
+  
     payments.forEach(payment => {
-      if (payment.status === 'completed') {
+      if (payment.status === 'completed' && payment.amount) {
+        const date = safeToDate(payment.createdAt);
+        if (!date) {
+          console.warn('Invalid date in payment:', payment.id);
+          return;
+        }
+  
         total += payment.amount;
-        const date = payment.createdAt.toDate();
         const dayKey = date.toISOString().split('T')[0];
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-
+  
         // Daily data
         const dayIndex = daily.findIndex(d => d.date === dayKey);
         if (dayIndex >= 0) {
@@ -200,7 +254,7 @@ export const AnalyticsDashboard: React.FC = () => {
         } else {
           daily.push({ date: dayKey, amount: payment.amount });
         }
-
+  
         // Monthly data
         const monthIndex = monthly.findIndex(m => m.date === monthKey);
         if (monthIndex >= 0) {
@@ -210,20 +264,21 @@ export const AnalyticsDashboard: React.FC = () => {
         }
       }
     });
-
+  
     return { daily, monthly, total };
   };
 
   const calculateNewUsersData = (users: User[], startDate: Date): UserData[] => {
     const userData: { [key: string]: number } = {};
-
+  
     users.forEach(user => {
-      if (user.createdAt.toDate() >= startDate) {
-        const date = user.createdAt.toDate().toISOString().split('T')[0];
-        userData[date] = (userData[date] || 0) + 1;
+      const date = safeToDate(user.createdAt);
+      if (date && date >= startDate) {
+        const dateKey = date.toISOString().split('T')[0];
+        userData[dateKey] = (userData[dateKey] || 0) + 1;
       }
     });
-
+  
     return Object.entries(userData)
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -248,13 +303,15 @@ export const AnalyticsDashboard: React.FC = () => {
 
   const calculateMonthlyCertificates = (certificates: Certificate[]): CertificateData[] => {
     const monthlyData: { [key: string]: number } = {};
-
+  
     certificates.forEach(cert => {
-      const date = cert.createdAt.toDate();
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+      const date = safeToDate(cert.createdAt);
+      if (date) {
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+      }
     });
-
+  
     return Object.entries(monthlyData)
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -264,6 +321,32 @@ export const AnalyticsDashboard: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
+          Error loading analytics: {error}
+        </div>
+        <button 
+          onClick={() => fetchAnalytics()} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <div className="p-6">
+        <div className="bg-yellow-50 text-yellow-700 p-4 rounded-lg">
+          No analytics data available
+        </div>
       </div>
     );
   }

@@ -83,7 +83,7 @@ const LandingPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <Link 
             to="/courses"
-            className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 rounded-lg"
+            className="bg-blue-600 hover:bg-blue-800 text-white text-lg px-8 py-4 rounded-lg"
           >
             Przeglądaj kursy
           </Link>
