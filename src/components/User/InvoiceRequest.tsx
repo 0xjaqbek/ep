@@ -151,7 +151,7 @@ export const InvoiceRequest: React.FC = () => {
   
         {!currentUser?.invoiceData && (
           <div className="mb-4 p-4 bg-yellow-50 text-yellow-700 rounded">
-            Aby wygenerować fakturę, najpierw uzupełnij dane do faktury w ustawieniach konta.
+            Aby wygenerować fakturę, najpierw uzupełnij dane do faktury w ustawieniach konta i ZAPISZ ZMIANY.
           </div>
         )}
   
