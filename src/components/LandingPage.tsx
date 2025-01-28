@@ -61,9 +61,6 @@ const LandingPage = () => {
         />
  
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-white leading-tight mb-1">
-            Progres<span className="text-white">999</span>
-          </h1>
           <p className="text-sm font-light text-gray-200">
             Twoja wiedza, ich życie
           </p>
