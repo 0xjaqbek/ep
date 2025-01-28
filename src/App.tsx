@@ -43,6 +43,7 @@ import Contact from './components/Contact.tsx';
 import Regulations from './components/Regulations.tsx';
 import { Settings } from './components/Admin/Settings.tsx';
 import { DiscountManagement } from './components/Admin/DiscountManagement.tsx';
+import { UserInvoices } from './components/User/UserInvoice.tsx';
 
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
@@ -120,6 +121,14 @@ const App: React.FC = () => {
                         <PaymentSuccess />
                       </PrivateRoute>
                     } />
+
+                    <Route 
+                      path="/account/invoices" element={
+                        <PrivateRoute>
+                          <UserInvoices />
+                        </PrivateRoute>
+                      } 
+                    />
 
                     {/* Protected Admin Routes */}
                     <Route path="admin" element={

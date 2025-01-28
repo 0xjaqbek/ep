@@ -130,6 +130,7 @@ export interface InvoiceRequest {
   userEmail: string;
   courseIds: string[];
   courseTitles: string[];
+  courseAmounts?: number[]; // Make it optional
   totalAmount: number;
   status: 'pending' | 'processed' | 'rejected';
   createdAt: Date;
@@ -141,8 +142,8 @@ export interface InvoiceRequest {
     companyAddress: string;
   };
   invoiceNumber?: string;
-  invoiceUrl?: string;
-  comment?: string;
+  pdfUrl?: string;
+  comment?: string | null;
 }
 
 export interface InvoiceCounter {

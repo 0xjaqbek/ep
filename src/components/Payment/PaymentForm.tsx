@@ -224,15 +224,12 @@ export const PaymentForm: React.FC = () => {
         if (!referrerSnapshot.empty) {
           const referrerDoc = referrerSnapshot.docs[0];
           
-          // Single batch write for both updates
           const batch = writeBatch(db);
           
-          // Update referrer points
           batch.update(doc(db, 'users', referrerDoc.id), {
             referralPoints: increment(10)
           });
           
-          // Update current user points
           batch.update(userRef, {
             referralPoints: increment(5)
           });
@@ -241,19 +238,25 @@ export const PaymentForm: React.FC = () => {
         }
       }
   
-      // Add payment record
-      await addDoc(collection(db, 'payments'), {
+      // Create payment record with optional discount fields
+      const paymentData = {
         userId: auth.currentUser.uid,
         courseId: state.courseId,
         amount: finalPrice,
         originalPrice: state.coursePrice,
         finalPrice: finalPrice,
-        discountCode: appliedDiscount?.code,
-        discountAmount: appliedDiscount ? (state.coursePrice - finalPrice) : 0,
         status: 'completed',
         createdAt: serverTimestamp(),
-        courseTitle: state.courseTitle
-      });
+        courseTitle: state.courseTitle,
+        // Only include discount fields if there is an applied discount
+        ...(appliedDiscount && {
+          discountCode: appliedDiscount.code,
+          discountAmount: state.coursePrice - finalPrice
+        })
+      };
+  
+      // Add payment record
+      await addDoc(collection(db, 'payments'), paymentData);
   
       navigate('/payment/success', {
         state: {
