@@ -17,6 +17,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import logoImage from '../../assets/logoEP.png';
 import { RatingModal } from '../RatingModal.tsx';
+import { useCart } from '../../contexts/CartContext.tsx';
 
 
 interface CertificateData {
@@ -81,6 +82,7 @@ export const CourseList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const { addToCart, state: cartState } = useCart();
 
   const refreshUserData = async () => {
     if (currentUser?.uid) {
@@ -162,25 +164,17 @@ export const CourseList: React.FC = () => {
     if (!currentUser) {
       navigate('/login', { 
         state: { 
-          redirectAfterLogin: `/courses/${course.id}`,
+          redirectAfterLogin: `/courses`,
           message: 'Zaloguj się, aby kupić kurs' 
         } 
       });
       return;
     }
-
-    await refreshUserData(); // Refresh before checking status
-
+  
     if (currentUser.purchasedCourses?.includes(course.id)) {
       navigate(`/course/${course.id}/learn`);
     } else {
-      navigate(`/payment/checkout`, {
-        state: {
-          courseId: course.id,
-          courseTitle: course.title,
-          coursePrice: course.price
-        }
-      });
+      addToCart(course);
     }
   };
 
@@ -283,7 +277,7 @@ export const CourseList: React.FC = () => {
                   <div className="flex justify-between items-center pt-4 border-t">
                     <span className="text-2xl font-bold text-blue-600">{course.price} PLN</span>
                     <div className="flex flex-col items-end">
-                      <button 
+                    <button 
                         className={`px-6 py-2 rounded-lg text-white font-semibold ${
                           currentUser?.completedCourses?.some(cc => cc.courseId === course.id)
                             ? 'bg-green-500 cursor-default'
@@ -298,7 +292,10 @@ export const CourseList: React.FC = () => {
                           ? 'Zaliczony'
                           : currentUser?.purchasedCourses?.includes(course.id)
                             ? 'Rozpocznij kurs'
-                            : 'Kup teraz'}
+                            : cartState.items.some(item => item.courseId === course.id)
+                              ? 'W koszyku' // New text for when course is in cart
+                              : 'Dodaj do koszyka'
+                        }
                       </button>
                       {currentUser?.completedCourses?.some(cc => cc.courseId === course.id) && (
                         <>

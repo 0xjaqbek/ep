@@ -6,6 +6,7 @@ import { P24Service, P24PaymentData } from '../../services/payment/p24Service.ts
 import { doc, updateDoc, arrayUnion, getDoc, increment, collection, query, where, getDocs, writeBatch, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config.ts';
 import { DiscountCode } from '../../types/index.ts';
+import { useCart } from '../../contexts/CartContext.tsx';
 
 interface LocationState {
   courseId: string;
@@ -22,6 +23,7 @@ export const PaymentForm: React.FC = () => {
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
   const [discountError, setDiscountError] = useState('');
+  const { state: cartState, clearCart } = useCart();
 
   const state = location.state as LocationState;
 
@@ -153,16 +155,21 @@ export const PaymentForm: React.FC = () => {
         throw new Error('Użytkownik nie jest zalogowany');
       }
   
-      const finalPrice = calculateDiscountedPrice(state.coursePrice);
+      const courses = cartState.items.map(item => ({
+        courseId: item.courseId,
+        courseTitle: item.courseTitle,
+        amount: item.price
+      }));
+  
+      const finalPrice = calculateDiscountedPrice(cartState.total);
       
       const paymentData: P24PaymentData = {
-        courseId: state.courseId,
         userId: currentUser.uid,
-        amount: finalPrice,
-        originalPrice: state.coursePrice,
-        finalPrice: finalPrice,
         email: currentUser.email,
-        courseTitle: state.courseTitle,
+        amount: finalPrice,
+        originalPrice: cartState.total,
+        finalPrice: finalPrice,
+        courses,
         customerData: {
           firstName: currentUser.displayName.split(' ')[0] || '',
           lastName: currentUser.displayName.split(' ')[1] || '',
@@ -175,12 +182,14 @@ export const PaymentForm: React.FC = () => {
   
       if (appliedDiscount) {
         paymentData.discountCode = appliedDiscount.code;
-        paymentData.discountAmount = state.coursePrice - finalPrice;
-        await updateDiscountUsage(appliedDiscount.id);
+        paymentData.discountAmount = cartState.total - finalPrice;
       }
   
       const p24Service = new P24Service();
       const order = await p24Service.createOrder(paymentData);
+      
+      // Clear the cart before redirecting
+      clearCart();
       window.location.href = order.payment_url;
   
     } catch (error) {
@@ -194,20 +203,15 @@ export const PaymentForm: React.FC = () => {
   const handleSimulatePayment = async () => {
     setLoading(true);
     try {
-      if (!auth.currentUser?.uid) {
+      if (!currentUser?.uid) {
         throw new Error("User is not authenticated");
       }
   
-      const userRef = doc(db, 'users', auth.currentUser.uid);
-      const userDoc = await getDoc(userRef);
-      const userData = userDoc.data();
-  
-      // Calculate final price with discount
-      const finalPrice = calculateDiscountedPrice(state.coursePrice);
-  
-      // First update purchased courses
+      const userRef = doc(db, 'users', currentUser.uid);
+      
+      // Add all courses to user's purchased courses
       await updateDoc(userRef, {
-        purchasedCourses: arrayUnion(state.courseId)
+        purchasedCourses: arrayUnion(...cartState.items.map(item => item.courseId))
       });
   
       // Handle discount code usage if applied
@@ -215,53 +219,33 @@ export const PaymentForm: React.FC = () => {
         await updateDiscountUsage(appliedDiscount.id);
       }
   
-      // Handle referral points if applicable
-      if (userData?.referredBy) {
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('referralCode', '==', userData.referredBy));
-        const referrerSnapshot = await getDocs(q);
+      // Create payment records for each course
+      const batch = writeBatch(db);
+      
+      cartState.items.forEach(item => {
+        const paymentRef = doc(collection(db, 'payments'));
+        batch.set(paymentRef, {
+          userId: currentUser.uid,
+          courseId: item.courseId,
+          courseTitle: item.courseTitle,
+          amount: item.price,
+          status: 'completed',
+          createdAt: serverTimestamp(),
+          ...(appliedDiscount && {
+            discountCode: appliedDiscount.code,
+            discountAmount: calculateDiscount(item.price)
+          })
+        });
+      });
   
-        if (!referrerSnapshot.empty) {
-          const referrerDoc = referrerSnapshot.docs[0];
-          
-          const batch = writeBatch(db);
-          
-          batch.update(doc(db, 'users', referrerDoc.id), {
-            referralPoints: increment(10)
-          });
-          
-          batch.update(userRef, {
-            referralPoints: increment(5)
-          });
-  
-          await batch.commit();
-        }
-      }
-  
-      // Create payment record with optional discount fields
-      const paymentData = {
-        userId: auth.currentUser.uid,
-        courseId: state.courseId,
-        amount: finalPrice,
-        originalPrice: state.coursePrice,
-        finalPrice: finalPrice,
-        status: 'completed',
-        createdAt: serverTimestamp(),
-        courseTitle: state.courseTitle,
-        // Only include discount fields if there is an applied discount
-        ...(appliedDiscount && {
-          discountCode: appliedDiscount.code,
-          discountAmount: state.coursePrice - finalPrice
-        })
-      };
-  
-      // Add payment record
-      await addDoc(collection(db, 'payments'), paymentData);
-  
+      await batch.commit();
+      
+      // Clear the cart and redirect
+      clearCart();
       navigate('/payment/success', {
         state: {
-          courseId: state.courseId,
-          courseTitle: state.courseTitle,
+          courseIds: cartState.items.map(item => item.courseId),
+          courseTitles: cartState.items.map(item => item.courseTitle),
         },
       });
     } catch (error) {
@@ -277,11 +261,14 @@ export const PaymentForm: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6">Podsumowanie zamówienia</h2>
       
       <div className="mb-6">
-        <h3 className="font-semibold mb-2">Szczegóły kursu:</h3>
-        <p>Nazwa: {state.courseTitle}</p>
-        <p>Cena: {state.coursePrice} PLN</p>
+        <h3 className="font-semibold mb-2">Wybrane kursy:</h3>
+        {cartState.items.map(item => (
+          <div key={item.courseId} className="flex justify-between items-center py-2">
+            <span>{item.courseTitle}</span>
+            <span>{item.price} PLN</span>
+          </div>
+        ))}
       </div>
-
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Dane do płatności:</h3>
         <p>Email: {currentUser.email}</p>
@@ -390,3 +377,7 @@ export const PaymentForm: React.FC = () => {
     </div>
   );
 };
+
+function calculateDiscount(price: number): any {
+  throw new Error('Function not implemented.');
+}

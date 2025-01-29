@@ -1,145 +1,213 @@
 // src/services/payment/p24Service.ts
-import axios from 'axios';
-
-const WOOCOMMERCE_API_URL = process.env.REACT_APP_WOOCOMMERCE_API_URL;
-const WC_CONSUMER_KEY = process.env.REACT_APP_WC_CONSUMER_KEY;
-const WC_CONSUMER_SECRET = process.env.REACT_APP_WC_CONSUMER_SECRET;
-
-export interface P24PaymentData {
-  courseId: string;
-  courseTitle: string;
-  userId: string;
-  amount: number;
-  originalPrice: number;
-  finalPrice: number;
-  discountCode?: string;
-  discountAmount?: number;
-  email: string;
-  customerData: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    address: string;
-    postal: string;
-    city: string;
-  };
-  invoiceData?: {
-    companyName: string;
-    nip: string;
-    companyAddress: string;
-  };
-}
+import { 
+  doc, 
+  collection, 
+  writeBatch, 
+  serverTimestamp, 
+  getDoc, 
+  query, 
+  where, 
+  getDocs,
+  Timestamp, 
+  arrayUnion
+} from 'firebase/firestore';
+import { db } from '../../firebase/config.ts';
+import { 
+  P24PaymentData, 
+  PaymentResponse, 
+  TransactionRecord,
+  PaymentRecord,
+  CoursePaymentData 
+} from '../../types/payment.ts';
 
 export class P24Service {
-  private getAuthHeaders() {
-    return {
-      Authorization: `Basic ${btoa(`${WC_CONSUMER_KEY}:${WC_CONSUMER_SECRET}`)}`,
-      'Content-Type': 'application/json',
-    };
-  }
+  private readonly API_URL = process.env.REACT_APP_P24_API_URL;
+  private readonly MERCHANT_ID = process.env.REACT_APP_P24_MERCHANT_ID;
+  private readonly CRC_KEY = process.env.REACT_APP_P24_CRC_KEY;
 
-  async createOrder(paymentData: P24PaymentData) {
+  async createOrder(data: P24PaymentData): Promise<PaymentResponse> {
     try {
+      const courseTitles = data.courses.map(course => course.courseTitle).join(', ');
+      
       const orderData = {
-        payment_method: 'przelewy24',
-        payment_method_title: 'Przelewy24',
-        set_paid: false,
-        billing: {
-          first_name: paymentData.customerData.firstName,
-          last_name: paymentData.customerData.lastName,
-          address_1: paymentData.customerData.address,
-          city: paymentData.customerData.city,
-          postcode: paymentData.customerData.postal,
-          email: paymentData.email,
-          phone: paymentData.customerData.phone,
-        },
-        line_items: [
-          {
-            name: `Kurs: ${paymentData.courseTitle}`,
-            price: paymentData.originalPrice,
-            quantity: 1,
-            subtotal: paymentData.originalPrice.toString(),
-            total: paymentData.finalPrice.toString(),
-          }
-        ],
-        meta_data: [
-          {
-            key: 'courseId',
-            value: paymentData.courseId
-          },
-          {
-            key: 'courseTitle',
-            value: paymentData.courseTitle
-          },
-          {
-            key: 'userId',
-            value: paymentData.userId
-          },
-          {
-            key: 'originalPrice',
-            value: paymentData.originalPrice.toString()
-          },
-          {
-            key: 'finalPrice',
-            value: paymentData.finalPrice.toString()
-          }
-        ]
+        merchantId: this.MERCHANT_ID,
+        sessionId: `${Date.now()}`,
+        amount: Math.round(data.finalPrice * 100),
+        currency: 'PLN',
+        description: `Zakup kursów: ${courseTitles}`,
+        email: data.email,
+        client: `${data.customerData.firstName} ${data.customerData.lastName}`,
+        address: data.customerData.address,
+        zip: data.customerData.postal,
+        city: data.customerData.city,
+        phone: data.customerData.phone,
+        country: 'PL',
+        language: 'pl',
+        urlReturn: `${window.location.origin}/payment/callback`,
+        urlStatus: `${process.env.REACT_APP_API_URL}/payment/status`,
+        sign: this.generateSignature(data.finalPrice),
+        encoding: 'UTF-8',
+        method: 0,
+        metadata: {
+          courses: data.courses,
+          userId: data.userId,
+          originalPrice: data.originalPrice,
+          discountCode: data.discountCode,
+          discountAmount: data.discountAmount
+        }
       };
-  
-      // Add discount information if present
-      if (paymentData.discountCode) {
-        orderData.meta_data.push(
-          {
-            key: 'discountCode',
-            value: paymentData.discountCode
-          },
-          {
-            key: 'discountAmount',
-            value: paymentData.discountAmount?.toString() || '0'
-          }
-        );
+
+      const response = await fetch(`${this.API_URL}/transaction/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create order');
       }
-  
-      if (paymentData.invoiceData) {
-        orderData.meta_data.push(
-          {
-            key: 'invoice_company',
-            value: paymentData.invoiceData.companyName
-          },
-          {
-            key: 'invoice_nip',
-            value: paymentData.invoiceData.nip
-          },
-          {
-            key: 'invoice_address',
-            value: paymentData.invoiceData.companyAddress
-          }
-        );
-      }
-  
-      const response = await axios.post(
-        `${WOOCOMMERCE_API_URL}/orders`,
-        orderData,
-        { headers: this.getAuthHeaders() }
-      );
-  
-      return response.data;
+
+      const result = await response.json();
+
+      await this.saveTransactionDetails(orderData, data);
+
+      return {
+        orderId: result.data.orderId,
+        payment_url: result.data.paymentUrl
+      };
     } catch (error) {
-      console.error('Error creating WooCommerce order:', error);
-      throw new Error('Failed to create order');
+      console.error('Error creating P24 order:', error);
+      throw error;
     }
   }
 
-  async verifyPayment(orderId: string) {
+  private async saveTransactionDetails(orderData: any, paymentData: P24PaymentData) {
+    const batch = writeBatch(db);
+    
+    // Create transaction record
+    const transactionRef = doc(collection(db, 'transactions'));
+    const transactionRecord: TransactionRecord = {
+      userId: paymentData.userId,
+      courses: paymentData.courses,
+      sessionId: orderData.sessionId,
+      amount: paymentData.finalPrice,
+      originalAmount: paymentData.originalPrice,
+      status: 'pending',
+      email: paymentData.email,
+      createdAt: Timestamp.now(),
+      discountCode: paymentData.discountCode,
+      discountAmount: paymentData.discountAmount
+    };
+    
+    batch.set(transactionRef, transactionRecord);
+
+    // Create individual payment records for each course
+    paymentData.courses.forEach((course, index) => {
+      const paymentRef = doc(collection(db, 'payments'));
+      const paymentRecord: PaymentRecord = {
+        userId: paymentData.userId,
+        courseId: course.courseId,
+        courseTitle: course.courseTitle,
+        transactionId: transactionRef.id,
+        amount: course.amount,
+        status: 'pending',
+        createdAt: Timestamp.now(),
+        discountCode: paymentData.discountCode,
+        discountAmount: this.calculateCourseDiscount(
+          paymentData.courses.length,
+          index,
+          paymentData.discountAmount || 0
+        )
+      };
+      
+      batch.set(paymentRef, paymentRecord);
+    });
+
+    await batch.commit();
+  }
+
+  private calculateCourseDiscount(totalCourses: number, index: number, totalDiscount: number): number {
+    const baseDiscount = totalDiscount / totalCourses;
+    const roundedDiscount = Math.round(baseDiscount * 100) / 100;
+    
+    if (index === totalCourses - 1) {
+      const difference = totalDiscount - (roundedDiscount * (totalCourses - 1));
+      return Math.round(difference * 100) / 100;
+    }
+    
+    return roundedDiscount;
+  }
+
+  private generateSignature(amount: number): string {
+    const data = `${this.MERCHANT_ID}|${Math.round(amount * 100)}|PLN|${this.CRC_KEY}`;
+    // Implement proper hashing as per P24 docs
+    return 'generated_signature';
+  }
+
+  async verifyPayment(orderId: string): Promise<boolean> {
     try {
-      const response = await axios.get(
-        `${WOOCOMMERCE_API_URL}/orders/${orderId}`,
-        { headers: this.getAuthHeaders() }
-      );
-      return response.data.status === 'completed';
+      const response = await fetch(`${this.API_URL}/transaction/verify/${orderId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.REACT_APP_P24_API_KEY}`
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'SUCCESS') {
+        await this.handleSuccessfulPayment(orderId);
+        return true;
+      }
+
+      return false;
     } catch (error) {
       console.error('Error verifying payment:', error);
       return false;
     }
+  }
+
+  private async handleSuccessfulPayment(orderId: string) {
+    const transactionRef = doc(db, 'transactions', orderId);
+    const transactionDoc = await getDoc(transactionRef);
+
+    if (!transactionDoc.exists()) {
+      throw new Error('Transaction not found');
+    }
+
+    const transaction = transactionDoc.data() as TransactionRecord;
+    const batch = writeBatch(db);
+
+    // Update transaction status
+    batch.update(transactionRef, {
+      status: 'completed',
+      completedAt: serverTimestamp()
+    });
+
+    // Update payment records
+    const paymentsQuery = query(
+      collection(db, 'payments'), 
+      where('transactionId', '==', orderId)
+    );
+    const payments = await getDocs(paymentsQuery);
+
+    payments.forEach(payment => {
+      batch.update(payment.ref, {
+        status: 'completed',
+        completedAt: serverTimestamp()
+      });
+    });
+
+    // Add courses to user's purchased courses
+    const userRef = doc(db, 'users', transaction.userId);
+    const courseIds = transaction.courses.map(course => course.courseId);
+    batch.update(userRef, {
+      purchasedCourses: arrayUnion(...courseIds)
+    });
+
+    await batch.commit();
   }
 }

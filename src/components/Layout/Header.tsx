@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { auth, db } from '../../firebase/config.ts';
+import { CartButton } from '../Cart/CartButton.tsx';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const Header: React.FC = () => {
@@ -81,6 +82,7 @@ export const Header: React.FC = () => {
           </div>
          
           <div className="flex items-center space-x-4">
+          <CartButton />
             {currentUser ? (
               <div className="relative">
                 <button

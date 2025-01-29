@@ -25,6 +25,7 @@ import { Register } from './components/Auth/Register.tsx';
 import { PaymentCallback } from './components/Payment/PaymentCallback.tsx';
 import { PaymentForm } from './components/Payment/PaymentForm.tsx';
 import { PaymentSuccess } from './components/Payment/PaymentSuccess.tsx';
+import { Checkout } from './components/Payment/Checkout.tsx';
 
 // Course Components
 import { CourseList } from './components/Courses/CourseList.tsx';
@@ -44,6 +45,7 @@ import Regulations from './components/Regulations.tsx';
 import { Settings } from './components/Admin/Settings.tsx';
 import { DiscountManagement } from './components/Admin/DiscountManagement.tsx';
 import { UserInvoices } from './components/User/UserInvoice.tsx';
+import { CartProvider } from './contexts/CartContext.tsx';
 
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
@@ -75,6 +77,7 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <Router>
         <AuthProvider>
+          <CartProvider>
           <div className="min-h-screen bg-gray-50">
             <Header />
             <Routes>
@@ -121,7 +124,11 @@ const App: React.FC = () => {
                         <PaymentSuccess />
                       </PrivateRoute>
                     } />
-
+                    <Route path="/checkout" element={
+                      <PrivateRoute>
+                        <Checkout />
+                      </PrivateRoute>
+                    } />
                     <Route 
                       path="/account/invoices" element={
                         <PrivateRoute>
@@ -159,6 +166,7 @@ const App: React.FC = () => {
             <CookieConsent />
             <Footer />
           </div>
+          </CartProvider>
         </AuthProvider>
       </Router>
     </ErrorBoundary>
