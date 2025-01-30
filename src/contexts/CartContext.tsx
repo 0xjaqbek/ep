@@ -1,6 +1,8 @@
 // src/contexts/CartContext.tsx
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Course } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/Auth/AuthProvider.tsx';
 
 interface CartItem {
   courseId: string;
@@ -58,6 +60,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     total: 0
   });
 
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
   // Persist cart state in localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
@@ -74,6 +79,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [state]);
 
   const addToCart = (course: Course) => {
+    if (!currentUser) {
+      navigate('/login', { 
+        state: { 
+          from: '/courses',
+          message: 'Zaloguj się, aby dodać kurs do koszyka' 
+        } 
+      });
+      return;
+    }
+    
     dispatch({
       type: 'ADD_ITEM',
       payload: {

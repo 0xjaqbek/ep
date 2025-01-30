@@ -1,5 +1,5 @@
 // src/components/Payment/Checkout.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useCart } from '../../contexts/CartContext.tsx';
@@ -18,6 +18,23 @@ export const Checkout: React.FC = () => {
   const [error, setError] = useState('');
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login', { 
+        state: { 
+          from: '/checkout',
+          message: 'Zaloguj się, aby kontynuować zakupy' 
+        } 
+      });
+      return;
+    }
+  }, [currentUser, navigate]);
+
+  // If user is not logged in, show loading or return null
+  if (!currentUser) {
+    return null;
+  }
 
   const verifyDiscountCode = async (code: string) => {
     try {

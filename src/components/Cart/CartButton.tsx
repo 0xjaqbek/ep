@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext.tsx';
+import { useAuth } from '../Auth/AuthProvider.tsx';
 
 export const CartButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { state, removeFromCart } = useCart();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
@@ -13,10 +15,27 @@ export const CartButton: React.FC = () => {
     navigate('/checkout');
   };
 
+  const handleCartClick = () => {
+    if (!currentUser) {
+      navigate('/login', { 
+        state: { 
+          from: '/checkout',
+          message: 'Zaloguj się, aby zobaczyć koszyk' 
+        } 
+      });
+      return;
+    }
+    setIsOpen(!isOpen);
+  };
+
+  if (!currentUser) {
+    return null; // Don't render anything if user is not logged in
+  }
+
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleCartClick}
         className="flex items-center space-x-1 px-4 py-2 text-white rounded-lg bg-blue-600 hover:bg-blue-700"
       >
         <span>Koszyk</span>

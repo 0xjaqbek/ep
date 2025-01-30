@@ -81,82 +81,86 @@ export const Header: React.FC = () => {
             </Link>
           </div>
          
-          <div className="flex items-center space-x-4">
-          <CartButton />
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             {currentUser ? (
-              <div className="relative">
-                <button
-                  ref={buttonRef}
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
-                >
-                  <span>Moje konto</span>
-                  <svg
-                    className={`h-5 w-5 transform transition-transform ${
-                      showUserMenu ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+              <>
+                <div className="order-1 sm:order-none">
+                  <CartButton />
+                </div>
+                <div className="relative order-2 sm:order-none">
+                  <button
+                    ref={buttonRef}
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="w-full sm:w-auto flex items-center justify-center space-x-2 text-gray-700 hover:text-gray-900"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {showUserMenu && (
-                  <div ref={menuRef} className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
-                    <div className="px-4 py-2 text-sm font-medium text-gray-500 border-b border-gray-100">
-                      {currentUser.email}
+                    <span>Moje konto</span>
+                    <svg
+                      className={`h-5 w-5 transform transition-transform ${
+                        showUserMenu ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+  
+                  {showUserMenu && (
+                    <div ref={menuRef} className="absolute right-0 mt-2 w-48 py-2 bg-white rounded-lg shadow-xl z-50">
+                      <div className="px-4 py-2 text-sm font-medium text-gray-500 border-b border-gray-100">
+                        {currentUser.email}
+                      </div>
+                      <Link
+                        to="/account"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Moje dane
+                      </Link>
+                      <Link
+                        to="/courses"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Moje kursy
+                      </Link>
+                      {showReferrals && (
+                        <Link
+                          to="/referrals"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Program poleceń
+                        </Link>
+                      )}
+                      {currentUser.role === 'admin' && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Panel Admina
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setShowUserMenu(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Wyloguj się
+                      </button>
                     </div>
-                    <Link
-                      to="/account"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      Moje dane
-                    </Link>
-                    <Link
-                      to="/courses"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      Moje kursy
-                    </Link>
-                    {showReferrals && (
-                      <Link
-                        to="/referrals"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Program poleceń
-                      </Link>
-                    )}
-                    {currentUser.role === 'admin' && (
-                      <Link
-                        to="/admin"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Panel Admina
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        setShowUserMenu(false);
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Wyloguj się
-                    </button>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="flex flex-col space-y-2">
                 <Link 
@@ -178,4 +182,4 @@ export const Header: React.FC = () => {
       </div>
     </header>
   );
-};
+}
