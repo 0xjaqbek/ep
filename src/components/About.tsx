@@ -1,7 +1,12 @@
 import React from 'react';
+import SEO from './SEO.tsx';
 
 const About = () => {
   return (
+    <><SEO 
+    title="O Nas"
+    description="Poznaj Progress999 - platformę edukacyjną stworzoną przez profesjonalistów z branży ratownictwa medycznego."
+  />
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Kim jesteśmy</h1>
       <div className="prose lg:prose-lg">
@@ -27,6 +32,7 @@ const About = () => {
         </ul>
       </div>
     </div>
+    </>
   );
 };
 

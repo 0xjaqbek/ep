@@ -1,3 +1,9 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /account/
+Disallow: /payment/
+Disallow: /checkout/
+
+Sitemap: https://progres999.pl/sitemap.xml

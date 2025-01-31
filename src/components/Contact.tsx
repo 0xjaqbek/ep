@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.ts';
 import { useAuth } from './Auth/AuthProvider.tsx';
+import SEO from './SEO.tsx';
 
 const Contact = () => {
   const { currentUser } = useAuth();
@@ -56,6 +57,10 @@ const Contact = () => {
   };
 
   return (
+    <><SEO 
+    title="Kontakt"
+    description="Skontaktuj się z nami. Jesteśmy tu, aby pomóc w Twoim rozwoju zawodowym."
+  />
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Kontakt</h1>
 
@@ -139,6 +144,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

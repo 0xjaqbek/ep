@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config.ts';
 import { CourseTest } from './CourseTest.tsx';
 import { Course } from '../../types';
+import SEO from '../SEO.tsx';
 
 export const CourseView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -75,6 +76,12 @@ export const CourseView: React.FC = () => {
     }
     
     return (
+      <>
+      <SEO 
+        title="Kursy"
+        description="Przeglądaj nasze kursy medyczne. Zdobywaj wiedzę i punkty edukacyjne online."
+        ogType="website"
+      />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">{course.title}</h1>
         
@@ -123,5 +130,6 @@ export const CourseView: React.FC = () => {
           )}
         </div>
       </div>
+      </>
     );
   };

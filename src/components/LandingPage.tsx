@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoEP from '../assets/logoEP.png';
-import ambu1 from '../assets/ambu1.jpg';
-import ambu2 from '../assets/ambu2.jpg';
-import ambu3 from '../assets/ambu3.jpg';
-import ambu4 from '../assets/ambu4.jpg';
-import ambu5 from '../assets/ambu5.jpg';
+import ambu1 from '../assets/ambu1.webp';
+import ambu2 from '../assets/ambu2.webp';
+import ambu3 from '../assets/ambu3.webp';
+import ambu4 from '../assets/ambu4.webp';
+import ambu5 from '../assets/ambu5.webp';
 import { OpinionsDialog  } from '../components/OpinionsDialog.tsx';
+import SEO from './SEO.tsx';
 
 const backgroundImages = [ambu1, ambu2, ambu3, ambu4, ambu5];
 
@@ -43,6 +44,12 @@ const LandingPage = () => {
   }
 
   return (
+    <>
+    <SEO 
+  title="Strona Główna"
+  description="Platforma edukacyjna dla zawodów medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
+/>
+
     <div className="relative min-h-screen flex flex-col bg-black">
       <div 
         className="absolute inset-0 w-full h-full bg-center bg-cover bg-no-repeat transition-all duration-1000"
@@ -111,6 +118,7 @@ const LandingPage = () => {
         />
       )}
     </div>
+    </>
   );
  };
  

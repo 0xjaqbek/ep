@@ -47,6 +47,8 @@ import { DiscountManagement } from './components/Admin/DiscountManagement.tsx';
 import { UserInvoices } from './components/User/UserInvoice.tsx';
 import { CartProvider } from './contexts/CartContext.tsx';
 
+import { HelmetProvider } from 'react-helmet-async';
+
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
     <h1 className="text-2xl font-bold mb-4">404 - Strona nie znaleziona</h1>
@@ -75,6 +77,7 @@ const UnauthorizedPage: React.FC = () => (
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
+      <HelmetProvider>
       <Router>
         <AuthProvider>
           <CartProvider>
@@ -169,6 +172,7 @@ const App: React.FC = () => {
           </CartProvider>
         </AuthProvider>
       </Router>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 };

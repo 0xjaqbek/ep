@@ -18,6 +18,7 @@ import { jsPDF } from 'jspdf';
 import logoImage from '../../assets/logoEP.png';
 import { RatingModal } from '../RatingModal.tsx';
 import { useCart } from '../../contexts/CartContext.tsx';
+import SEO from '../SEO.tsx';
 
 
 interface CertificateData {
@@ -231,7 +232,13 @@ export const CourseList: React.FC = () => {
 
   // Rest of your component (JSX) remains the same...
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEO 
+        title="Kursy"
+        description="Przeglądaj kursy z ratownictwa medycznego. Ucz się online, zdobywaj punkty edukacyjne i certyfikaty."
+        keywords="kursy medyczne, ratownictwo medyczne, punkty edukacyjne, certyfikaty"
+      />
+      <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6">Dostępne kursy</h2>
       {loading ? (
         <div className="flex items-center justify-center min-h-screen">
@@ -348,6 +355,7 @@ export const CourseList: React.FC = () => {
       )}
     
     </div>
+    </>
   );
 };
 
