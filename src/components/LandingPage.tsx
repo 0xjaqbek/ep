@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logoEP from '../assets/logoEP.png';
+import logoEP from '../assets/logoEP.webp';
 import ambu1 from '../assets/ambu1.webp';
 import ambu2 from '../assets/ambu2.webp';
 import ambu3 from '../assets/ambu3.webp';
@@ -62,9 +62,13 @@ const LandingPage = () => {
  
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center text-white">
         <img
-          src={logoEP}
+          src="/static/media/logoEP.webp"
           alt="EP Logo"
+          width="256"
+          height="auto"
           className="w-64 h-auto mb-1"
+          loading="eager"
+          fetchPriority="high"
         />
  
         <div className="mb-8">

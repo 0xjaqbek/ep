@@ -76,6 +76,7 @@ export const CourseTest: React.FC<CourseTestProps> = ({ courseId, courseName, qu
   };
 
   const generateCertificatePDF = async (certificateNumber: string, score: number): Promise<string> => {
+    const { jsPDF } = await import('jspdf');
     const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
 
     pdfDoc.setFillColor(240, 240, 240);

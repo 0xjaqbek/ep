@@ -1,6 +1,6 @@
 // src/utils/certificateUtils.tsx
 import { jsPDF } from 'jspdf';
-import logoImage from '../assets/logoEP.png';
+import logoImage from '../assets/logoEP.webp';
 
 export interface CertificateData {
   userName: string | null;
@@ -23,7 +23,8 @@ export const generateCertificateNumber = (courseId: string, userId: string) => {
   return `CERT-${courseId.substring(0, 4)}-${dateStr}-${userPrefix}`;
 };
 
-export const generateAndDownloadPDF = (data: CertificateData) => {
+export const generateAndDownloadPDF = async (data: CertificateData) => {
+  const { jsPDF } = await import('jspdf');
   const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
 
   pdfDoc.setFillColor(240, 240, 240);

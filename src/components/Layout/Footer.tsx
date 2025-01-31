@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoEP from '../../assets/logoEP.png';
+import logoEP from '../../assets/logoEP.webp';
 
 export const Footer = () => {
   return (

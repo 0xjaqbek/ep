@@ -15,7 +15,7 @@ import { Course, CompletedCourse, User } from '../../types';
 import { useAuth } from '../Auth/AuthProvider.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
-import logoImage from '../../assets/logoEP.png';
+import logoImage from '../../assets/logoEP.webp';
 import { RatingModal } from '../RatingModal.tsx';
 import { useCart } from '../../contexts/CartContext.tsx';
 import SEO from '../SEO.tsx';
@@ -28,7 +28,8 @@ interface CertificateData {
   completionDate: Date;
 }
 
-const generateAndDownloadPDF = (data: CertificateData) => {
+const generateAndDownloadPDF = async (data: CertificateData) => {
+  const { jsPDF } = await import('jspdf');
   const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
 
   pdfDoc.setFillColor(240, 240, 240);
