@@ -12,7 +12,7 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(jpg|jpeg|gif|png|webp|svg|js|css)",
+        "source": "**/*.@(jpg|jpeg|gif|png|webp|svg|js|css|woff2|ttf|json|br)",
         "headers": [
           {
             "key": "Cache-Control",
@@ -21,11 +21,28 @@
         ]
       },
       {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Pragma",
+            "value": "no-cache"
+          },
+          {
+            "key": "Expires",
+            "value": "0"
+          }
+        ]
+      },
+      {
         "source": "**",
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://*.cloudfunctions.net https://*.googleapis.com;"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://*.firebaseio.com https://*.cloudfunctions.net https://*.googleapis.com;"
           },
           {
             "key": "X-Content-Type-Options",
@@ -38,6 +55,14 @@
           {
             "key": "X-XSS-Protection",
             "value": "1; mode=block"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "geolocation=(self), microphone=(), camera=()"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
           }
         ]
       }
