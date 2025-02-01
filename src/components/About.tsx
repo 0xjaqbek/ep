@@ -5,13 +5,13 @@ const About = () => {
   return (
     <><SEO 
     title="O Nas"
-    description="Poznaj Progress999 - platformę edukacyjną stworzoną przez profesjonalistów z branży ratownictwa medycznego."
+    description="Poznaj Progres999 - platformę edukacyjną stworzoną przez profesjonalistów z branży ratownictwa medycznego."
   />
     <div className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Kim jesteśmy</h1>
       <div className="prose lg:prose-lg">
         <p className="mb-4">
-          Progress999 to platforma edukacyjna stworzona przez profesjonalistów z branży ratownictwa medycznego, 
+          Progres999 to platforma edukacyjna stworzona przez profesjonalistów z branży ratownictwa medycznego, 
           mająca na celu podnoszenie kwalifikacji ratowników medycznych poprzez wysokiej jakości kursy online.
         </p>
         

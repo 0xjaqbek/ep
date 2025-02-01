@@ -11,7 +11,7 @@ interface Opinion {
   createdAt: any;
 }
 
-export const OpinionsDialog: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+const OpinionsDialog: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const [opinions, setOpinions] = useState<Opinion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,7 +77,7 @@ export const OpinionsDialog: React.FC<{ isOpen: boolean; onClose: () => void }> 
                   </div>
                   <p className="text-gray-700">{opinion.comment}</p>
                   <div className="text-sm text-gray-500 mt-2">
-                    {opinion.createdAt.toDate().toLocaleDateString()}
+                    {opinion.createdAt?.toDate ? opinion.createdAt.toDate().toLocaleDateString() : 'Nieznana data'}
                   </div>
                 </div>
               ))}
@@ -88,3 +88,5 @@ export const OpinionsDialog: React.FC<{ isOpen: boolean; onClose: () => void }> 
     </div>
   );
 };
+
+export default OpinionsDialog; // ✅ Ensure this line exists

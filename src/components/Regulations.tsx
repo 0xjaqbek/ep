@@ -9,17 +9,17 @@ const Regulations = () => {
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4">§1. Postanowienia ogólne</h2>
           <p>
-            1.1. Niniejszy regulamin określa zasady korzystania z platformy edukacyjnej Progress999.
+            1.1. Niniejszy regulamin określa zasady korzystania z platformy edukacyjnej Progres999.
           </p>
           <p>
-            1.2. Właścicielem platformy jest Progress999 Sp. z o.o. z siedzibą w Warszawie.
+            1.2. Właścicielem platformy jest Progres999 Sp. z o.o. z siedzibą w Warszawie.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4">§2. Definicje</h2>
           <p>
-            2.1. Platforma - serwis internetowy dostępny pod adresem progress999.pl
+            2.1. Platforma - serwis internetowy dostępny pod adresem progres999.pl
           </p>
           <p>
             2.2. Użytkownik - osoba korzystająca z Platformy

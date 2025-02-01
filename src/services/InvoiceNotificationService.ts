@@ -121,8 +121,8 @@ import {
         subject,
         text: message,
         html: this.generateEmailTemplate(message, metadata),
-        from: 'faktury@progress999.pl',
-        replyTo: 'kontakt@progress999.pl'
+        from: 'faktury@progres999.pl',
+        replyTo: 'kontakt@progres999.pl'
       };
   
       // Send email using your preferred service
@@ -159,7 +159,7 @@ import {
           <body>
             <div class="container">
               <div class="header">
-                <h1>Progress999</h1>
+                <h1>Progres999</h1>
               </div>
               <div class="content">
                 <p>${message}</p>
@@ -174,7 +174,7 @@ import {
                 ` : ''}
                 <p>
                   W razie pytań, prosimy o kontakt na adres
-                  <a href="mailto:kontakt@progress999.pl">kontakt@progress999.pl</a>
+                  <a href="mailto:kontakt@progres999.pl">kontakt@progres999.pl</a>
                 </p>
               </div>
             </div>

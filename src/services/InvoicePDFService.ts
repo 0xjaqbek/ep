@@ -60,7 +60,7 @@ export class InvoicePDFService {
   private addCompanyDetails(details: InvoiceData['companyDetails']): void {
     // Seller details
     this.doc.text('Sprzedawca:', 20, 60);
-    this.doc.text('Progress999', 20, 67);
+    this.doc.text('Progres999', 20, 67);
     this.doc.text('ul. Przykładowa 1/2', 20, 74);
     this.doc.text('00-001 Warszawa', 20, 81);
     this.doc.text('NIP: 0000000000', 20, 88);
@@ -119,7 +119,7 @@ export class InvoicePDFService {
   private addWatermark(): void {
     this.doc.setFontSize(40);
     this.doc.setTextColor(230, 230, 230);
-    this.doc.text('Progress999', 105, 140, {
+    this.doc.text('Progres999', 105, 140, {
       align: 'center',
       angle: 45
     });

@@ -69,7 +69,7 @@ const Contact = () => {
           <h2 className="text-xl font-semibold mb-4">Dane kontaktowe</h2>
           <div className="space-y-2">
             <p><strong>Adres:</strong> ul. Przykładowa 1/2, 00-001 Warszawa</p>
-            <p><strong>Email:</strong> kontakt@progress999.pl</p>
+            <p><strong>Email:</strong> kontakt@progres999.pl</p>
             <p><strong>Telefon:</strong> +48 000 000 000</p>
             <p><strong>Godziny pracy:</strong> Pon-Pt 9:00-17:00</p>
           </div>
