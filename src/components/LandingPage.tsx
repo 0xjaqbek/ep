@@ -62,7 +62,7 @@ const LandingPage = () => {
  
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 text-center text-white">
         <img
-          src="/static/media/logoEP.webp"
+          src="../../build/static/media/logoEP.43010389791e8030e2ac.webp"
           alt="EP Logo"
           width="256"
           height="auto"
