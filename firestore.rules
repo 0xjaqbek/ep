@@ -124,5 +124,9 @@ service cloud.firestore {
         (resource.data.userId == request.auth.uid || isAdmin());
       allow write: if isAdmin();
     }
+
+        match /quizzes/{quizId} {
+      allow read: if request.auth != null;
+    }
   }
 }

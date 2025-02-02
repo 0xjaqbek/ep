@@ -49,6 +49,10 @@ import { CartProvider } from './contexts/CartContext.tsx';
 
 import { HelmetProvider } from 'react-helmet-async';
 
+import Quiz from './components/Quiz/Quiz.tsx';
+import Quiz1 from './components/Quiz/Quiz1.tsx';
+import Quiz2 from './components/Quiz/Quiz2.tsx';
+
 const NotFoundPage: React.FC = () => (
   <div className="flex flex-col items-center justify-center min-h-screen">
     <h1 className="text-2xl font-bold mb-4">404 - Strona nie znaleziona</h1>
@@ -139,6 +143,23 @@ const App: React.FC = () => {
                         </PrivateRoute>
                       } 
                     />
+
+                    <Route 
+                      path="/quiz" element={
+                      <PrivateRoute>
+                        <Quiz /> 
+                        </PrivateRoute>
+                      }
+                      />
+                                          <Route 
+                      path="/quiz1" element={
+                      <PrivateRoute>
+                        <Quiz1 /> 
+                        </PrivateRoute>
+                      }
+                      />
+                      <Route 
+                      path="/quiz2" element={<Quiz2 />} />
 
                     {/* Protected Admin Routes */}
                     <Route path="admin" element={

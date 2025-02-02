@@ -149,3 +149,26 @@ export interface InvoiceRequest {
 export interface InvoiceCounter {
   currentNumber: number;
 }
+
+export interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  questions: QuizQuestion[]; 
+  price?: number;
+  duration?: number;
+  points?: number;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number; // Changed from correctIndex to match the imported data
+  explanation: string;
+}
+
+export interface QuizOption {
+  id: string;
+  text: string;
+}

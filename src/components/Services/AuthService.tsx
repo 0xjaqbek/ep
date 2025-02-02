@@ -55,8 +55,11 @@ import {
   
     async loginWithGoogle() {
       try {
+        // First, attempt the sign in
         const result = await signInWithPopup(auth, this.googleProvider);
         const user = result.user;
+    
+        // After successful sign in, get the user document reference
         const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
     
@@ -67,9 +70,12 @@ import {
         let referrerDoc: QueryDocumentSnapshot<DocumentData> | undefined;
     
         if (referralCode) {
-          const referrerQuery = query(collection(db, 'users'), where('referralCode', '==', referralCode));
+          const referrerQuery = query(
+            collection(db, 'users'), 
+            where('referralCode', '==', referralCode)
+          );
           const referrerSnapshot = await getDocs(referrerQuery);
-          
+    
           if (!referrerSnapshot.empty) {
             referralPoints = 1;
             referredBy = referralCode;
@@ -78,9 +84,10 @@ import {
         }
     
         if (!userDoc.exists()) {
+          // Create new user document with proper initialization
           const newUserData = {
             uid: user.uid,
-            email: user.email,
+            email: user.email || '',
             displayName: user.displayName || 'User',
             role: 'student',
             phoneNumber: user.phoneNumber || '',
@@ -111,7 +118,11 @@ import {
     
         return result;
       } catch (error) {
-        console.error('Google sign in error:', error);
+        console.error('Google sign in error details:', error);
+        if (error instanceof Error) {
+          console.error('Error name:', error.name);
+          console.error('Error message:', error.message);
+        }
         throw error;
       }
     }
