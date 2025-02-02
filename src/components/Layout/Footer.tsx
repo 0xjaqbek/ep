@@ -43,8 +43,8 @@ export const Footer = () => {
 
           <div>
             <h3 className="font-bold mb-4">Kontakt</h3>
-            <p className="text-gray-400 mb-2">Email: kontakt@progres999.pl</p>
-            <p className="text-gray-400 mb-4">Tel: +48 000 000 000</p>
+            <p className="text-gray-400 mb-2">Email: jaqbek.eth@gmail.com</p>
+            <p className="text-gray-400 mb-4">Tel: +48 607 999 313</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
               <a href="#" className="text-gray-400 hover:text-white">LinkedIn</a>
