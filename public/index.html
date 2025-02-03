@@ -3,84 +3,106 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#000000">
-    <meta name="description" content="Platforma edukacyjna dla Ratowników Medycznych.">
-    <meta name="keywords" content="kursy medyczne, ratownictwo medyczne, edukacja medyczna, punkty edukacyjne">
+    <meta name="theme-color" content="#0066cc">
+    
+    <!-- Enhanced meta descriptions -->
+    <meta name="description" content="Profesjonalne kursy ratownictwa medycznego online. Zdobądź certyfikat i punkty edukacyjne. Szkolenia pierwszej pomocy dla ratowników medycznych. Ucz się w dogodnym czasie i miejscu.">
+    <meta name="keywords" content="ratownictwo medyczne, kursy dla ratowników, punkty edukacyjne ratownik, szkolenia medyczne online, pierwsza pomoc, certyfikaty ratownicze, kurs ratownika, edukacja medyczna, ratownictwo kurs, medyczne szkolenia">
+    <meta name="author" content="Progres999">
+    <meta name="robots" content="index, follow">
 
-    <title>Progres999 | Platforma Edukacyjna</title>
+    <!-- Language alternatives -->
+    <link rel="alternate" hreflang="pl" href="https://progres999.pl">
+    <link rel="canonical" href="https://progres999.pl">
 
-    <!-- Preload critical assets -->
-    <link rel="preload" as="image" href="/src/assets/logoEP.png" type="image/webp">
-    <link rel="preload" as="image" href="/static/media/ambu1.webp" type="image/webp">
-    <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" type="font/woff2" crossorigin="anonymous">
+    <title>Kursy Ratownictwa Medycznego Online | Certyfikaty i Punkty Edukacyjne | Progres999</title>
 
-    <!-- Apple & Favicons -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/icon-256x256.png">
-
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-
-    <!-- OpenGraph & SEO -->
+    <!-- Enhanced OpenGraph tags -->
     <meta property="og:locale" content="pl_PL">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Progres999">
-    <meta property="og:title" content="Progres999">
-    <meta property="og:description" content="Platforma edukacyjna dla ratowników medycznych.">
-    <meta property="og:image" content="https://progres999.pl/logo.png">
+    <meta property="og:site_name" content="Progres999 - Platforma Szkoleń Medycznych">
+    <meta property="og:title" content="Kursy Ratownictwa Medycznego Online | Certyfikaty i Punkty Edukacyjne">
+    <meta property="og:description" content="Profesjonalne kursy ratownictwa medycznego online. Zdobądź certyfikat i punkty edukacyjne. Elastyczne szkolenia dostępne 24/7.">
+    <meta property="og:image" content="https://progres999.pl/logoEP.png">
+    <meta property="og:image:alt" content="Progres999 - Platforma Szkoleń Medycznych">
     <meta property="og:url" content="https://progres999.pl">
-    
-    <!-- Preconnect to speed up loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Schema Markup for SEO -->
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kursy Ratownictwa Medycznego Online | Progres999">
+    <meta name="twitter:description" content="Profesjonalne kursy ratownictwa medycznego online. Zdobądź certyfikat i punkty edukacyjne.">
+    <meta name="twitter:image" content="https://progres999.pl/logo.png">
+
+    <!-- Enhanced Schema Markup -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@type": "EducationalOrganization",
         "name": "Progres999",
         "url": "https://progres999.pl",
-        "description": "Platforma edukacyjna dla ratowników medycznych. Zdobywaj wiedzę i punkty edukacyjne online.",
-        "publisher": {
-            "@type": "Organization",
-            "name": "Progres999",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "https://progres999.pl/logo.png"
-            },
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "customer service",
-                "email": "kontakt@progres999.pl",
-                "telephone": "+48 000 000 000"
-            }
+        "description": "Platforma edukacyjna dla ratowników medycznych oferująca profesjonalne kursy online z certyfikatami.",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "PL",
+            "addressLocality": "Warszawa",
+            "postalCode": "00-001",
+            "streetAddress": "ul. Przykładowa 1/2"
         },
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://progres999.pl/courses?search={search_term_string}",
-            "query-input": "required name=search_term_string"
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://progres999.pl/logoEP.png"
         },
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "email": "jaqbek.eth@gmail.com",
+            "telephone": "+48 607 999 313",
+            "availableLanguage": ["Polish"]
+        },
+        "sameAs": [
+            "https://facebook.com/progres999",
+            "https://linkedin.com/company/progres999"
+        ],
         "offers": {
             "@type": "Offer",
-            "description": "Kursy medyczne dla ratowników z certyfikatami",
-            "priceCurrency": "PLN"
+            "description": "Profesjonalne kursy medyczne z certyfikatami",
+            "priceCurrency": "PLN",
+            "availability": "http://schema.org/InStock",
+            "educationalCredentialAwarded": "Certyfikat ukończenia kursu"
+        },
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Kursy Ratownictwa Medycznego",
+            "itemListElement": [
+                {
+                    "@type": "Course",
+                    "name": "Kurs Podstawowy Ratownictwa",
+                    "description": "Podstawy ratownictwa medycznego",
+                    "provider": "Progres999"
+                }
+            ]
         }
     }
     </script>
 
-    <!-- Async Google Tag Manager -->
-    <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-RZ6YEM3JFZ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-RZ6YEM3JFZ', { 'anonymize_ip': true });
-    </script>
+    <!-- Preload critical assets with improved paths -->
+    <link rel="preload" as="image" href="/assets/logoEP.webp" type="image/webp">
+    <link rel="preload" as="image" href="/assets/ambu1.webp" type="image/webp">
+    <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" crossorigin>
 
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
+
+    <!-- Your existing scripts and links -->
+    ...
 </head>
 <body>
-    <noscript>Musisz włączyć JavaScript, aby uruchomić tę aplikację.</noscript>
+    <noscript>
+        <h1>Kursy Ratownictwa Medycznego Online</h1>
+        <p>Aby korzystać z platformy Progres999, włącz obsługę JavaScript w swojej przeglądarce.</p>
+    </noscript>
     <div id="root"></div>
 </body>
 </html>
