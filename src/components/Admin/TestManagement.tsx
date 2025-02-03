@@ -17,7 +17,7 @@ interface Course {
   testQuestions: TestQuestion[];
 }
 
-export const TestManagement: React.FC = () => {
+const TestManagement: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -277,3 +277,5 @@ export const TestManagement: React.FC = () => {
     </div>
   );
 };
+
+export default TestManagement;

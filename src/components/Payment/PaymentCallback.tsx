@@ -72,3 +72,5 @@ export const PaymentCallback: React.FC = () => {
     </div>
   );
 };
+
+export default PaymentCallback;

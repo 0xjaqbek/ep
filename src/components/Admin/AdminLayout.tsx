@@ -2,7 +2,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 
-export const AdminLayout: React.FC = () => {
+const AdminLayout: React.FC = () => {
   const location = useLocation();
 
   const isActive = (path: string) => {
@@ -93,3 +93,5 @@ export const AdminLayout: React.FC = () => {
     </div>
   );
 };
+
+export default AdminLayout;

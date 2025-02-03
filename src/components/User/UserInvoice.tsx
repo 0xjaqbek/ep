@@ -13,7 +13,7 @@ interface UserInvoice {
   courseTitles: string[];
 }
 
-export const UserInvoices: React.FC = () => {
+const UserInvoiceComponent: React.FC = () => {
   const { currentUser } = useAuth();
   const [invoices, setInvoices] = useState<UserInvoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,3 +156,5 @@ export const UserInvoices: React.FC = () => {
     </div>
   );
 };
+
+export default UserInvoiceComponent;

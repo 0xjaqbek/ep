@@ -8,7 +8,7 @@ interface AppSettings {
   showReferrals: boolean;
 }
 
-export const Settings: React.FC = () => {
+const Settings: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>({ showReferrals: false });
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -95,3 +95,5 @@ export const Settings: React.FC = () => {
     </div>
   );
 };
+
+export default Settings;

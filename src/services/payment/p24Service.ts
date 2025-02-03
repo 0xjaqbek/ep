@@ -87,7 +87,6 @@ export class P24Service {
   private async saveTransactionDetails(orderData: any, paymentData: P24PaymentData) {
     const batch = writeBatch(db);
     
-    // Create transaction record
     const transactionRef = doc(collection(db, 'transactions'));
     const transactionRecord: TransactionRecord = {
       userId: paymentData.userId,
@@ -104,7 +103,6 @@ export class P24Service {
     
     batch.set(transactionRef, transactionRecord);
 
-    // Create individual payment records for each course
     paymentData.courses.forEach((course, index) => {
       const paymentRef = doc(collection(db, 'payments'));
       const paymentRecord: PaymentRecord = {
@@ -143,7 +141,6 @@ export class P24Service {
 
   private generateSignature(amount: number): string {
     const data = `${this.MERCHANT_ID}|${Math.round(amount * 100)}|PLN|${this.CRC_KEY}`;
-    // Implement proper hashing as per P24 docs
     return 'generated_signature';
   }
 
@@ -181,13 +178,11 @@ export class P24Service {
     const transaction = transactionDoc.data() as TransactionRecord;
     const batch = writeBatch(db);
 
-    // Update transaction status
     batch.update(transactionRef, {
       status: 'completed',
       completedAt: serverTimestamp()
     });
 
-    // Update payment records
     const paymentsQuery = query(
       collection(db, 'payments'), 
       where('transactionId', '==', orderId)
@@ -201,7 +196,6 @@ export class P24Service {
       });
     });
 
-    // Add courses to user's purchased courses
     const userRef = doc(db, 'users', transaction.userId);
     const courseIds = transaction.courses.map(course => course.courseId);
     batch.update(userRef, {
@@ -211,3 +205,5 @@ export class P24Service {
     await batch.commit();
   }
 }
+
+export default P24Service;

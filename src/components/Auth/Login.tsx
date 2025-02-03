@@ -10,7 +10,7 @@ interface LocationState {
   message?: string;
 }
 
-export const Login: React.FC = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -144,3 +144,5 @@ export const Login: React.FC = () => {
     </div>
   );
 };
+
+export default Login;

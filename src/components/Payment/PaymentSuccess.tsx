@@ -18,7 +18,7 @@ interface CourseDetails {
   points: number;
 }
 
-export const PaymentSuccess: React.FC = () => {
+const PaymentSuccess: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { refreshUserData, currentUser } = useAuth();
@@ -149,3 +149,5 @@ export const PaymentSuccess: React.FC = () => {
     </div>
   );
 };
+
+export default PaymentSuccess;

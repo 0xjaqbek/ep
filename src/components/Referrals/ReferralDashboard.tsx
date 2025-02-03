@@ -5,7 +5,7 @@ import { db } from '../../firebase/config.ts';
 import { User } from '../../types';
 import { Toast } from '../Feedback/Toast.tsx';
 
-export const ReferralDashboard: React.FC = () => {
+const ReferralDashboard: React.FC = () => {
   const { currentUser } = useAuth();
   const [referredUsers, setReferredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -176,3 +176,4 @@ export const ReferralDashboard: React.FC = () => {
     </div>
   );
 };
+export default ReferralDashboard;

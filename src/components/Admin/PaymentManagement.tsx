@@ -15,7 +15,7 @@ interface Payment {
   transactionId: string;
 }
 
-export const PaymentManagement: React.FC = () => {
+const PaymentManagement: React.FC = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -192,3 +192,5 @@ export const PaymentManagement: React.FC = () => {
     </div>
   );
 };
+
+export default PaymentManagement;

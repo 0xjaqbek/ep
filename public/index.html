@@ -95,8 +95,26 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
 
-    <!-- Your existing scripts and links -->
-    ...
+    <!-- Apple & Favicons -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/icon-256x256.png">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    
+    <!-- Preconnect to speed up loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Async Google Tag Manager -->
+    <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-RZ6YEM3JFZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-RZ6YEM3JFZ', { 'anonymize_ip': true });
+    </script>
+
 </head>
 <body>
     <noscript>

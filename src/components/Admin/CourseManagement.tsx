@@ -22,7 +22,7 @@ const CourseSchema = Yup.object().shape({
   duration: Yup.number().required('Wymagane').min(1),
 });
 
-export const CourseManagement: React.FC = () => {
+const CourseManagement: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -269,3 +269,5 @@ export const CourseManagement: React.FC = () => {
     </div>
   );
 };
+
+export default CourseManagement;

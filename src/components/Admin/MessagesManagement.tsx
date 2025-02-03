@@ -13,7 +13,7 @@ interface Message {
   userId?: string;
 }
 
-export const MessagesManagement: React.FC = () => {
+const MessagesManagement: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
@@ -136,3 +136,5 @@ export const MessagesManagement: React.FC = () => {
     </div>
   );
 };
+
+export default MessagesManagement;

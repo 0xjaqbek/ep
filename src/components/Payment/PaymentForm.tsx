@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
-import { P24Service, P24PaymentData } from '../../services/payment/p24Service.ts';
+import  P24Service from '../../services/payment/p24Service.ts';
+import { P24PaymentData } from '../../types/payment.ts';
 import { doc, updateDoc, arrayUnion, getDoc, increment, collection, query, where, getDocs, writeBatch, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase/config.ts';
 import { DiscountCode } from '../../types/index.ts';
@@ -14,7 +15,7 @@ interface LocationState {
   coursePrice: number;
 }
 
-export const PaymentForm: React.FC = () => {
+const PaymentForm: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -381,3 +382,5 @@ export const PaymentForm: React.FC = () => {
 function calculateDiscount(price: number): any {
   throw new Error('Function not implemented.');
 }
+
+export default PaymentForm;

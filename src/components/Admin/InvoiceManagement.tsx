@@ -476,3 +476,5 @@ export const InvoiceManagement: React.FC = () => {
     </div>
   );
 };
+
+export default InvoiceManagement;

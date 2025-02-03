@@ -4,7 +4,7 @@ import { collection, getDocs } from 'firebase/firestore';  // Usuwamy nieużywan
 import { db } from '../../firebase/config.ts';
 import { User } from '../../types';
 
-export const UserManagement: React.FC = () => {
+const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -91,3 +91,5 @@ export const UserManagement: React.FC = () => {
     </div>
   );
 };
+
+export default UserManagement;

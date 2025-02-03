@@ -7,7 +7,7 @@ import { CourseTest } from './CourseTest.tsx';
 import { Course } from '../../types';
 import SEO from '../SEO.tsx';
 
-export const CourseView: React.FC = () => {
+const CourseView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
@@ -133,3 +133,5 @@ export const CourseView: React.FC = () => {
       </>
     );
   };
+
+export default CourseView

@@ -21,7 +21,7 @@ interface ExtendedCertificate extends Certificate {
   courseName: string;
 }
 
-export const CertificateManagement: React.FC = () => {
+const CertificateManagement: React.FC = () => {
   const [certificates, setCertificates] = useState<ExtendedCertificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -217,3 +217,5 @@ export const CertificateManagement: React.FC = () => {
     </div>
   );
 };
+
+export default CertificateManagement;

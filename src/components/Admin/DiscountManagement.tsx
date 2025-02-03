@@ -3,7 +3,7 @@ import { collection, query, getDocs, doc, addDoc, updateDoc, Timestamp, where } 
 import { db } from '../../firebase/config.ts';
 import { DiscountCode } from '../../types';
 
-export const DiscountManagement: React.FC = () => {
+const DiscountManagement: React.FC = () => {
   const [discountCodes, setDiscountCodes] = useState<DiscountCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [newCode, setNewCode] = useState({
@@ -202,3 +202,5 @@ export const DiscountManagement: React.FC = () => {
     </div>
   );
 };
+
+export default DiscountManagement;

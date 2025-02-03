@@ -14,7 +14,7 @@ interface Opinion {
   createdAt: any;
 }
 
-export const OpinionsManagement: React.FC = () => {
+const OpinionsManagement: React.FC = () => {
   const [opinions, setOpinions] = useState<Opinion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -121,3 +121,5 @@ export const OpinionsManagement: React.FC = () => {
     </div>
   );
 };
+
+export default OpinionsManagement;

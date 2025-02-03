@@ -82,7 +82,7 @@ interface AnalyticsData {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-export const AnalyticsDashboard: React.FC = () => {
+const AnalyticsDashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -476,3 +476,5 @@ export const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default AnalyticsDashboard;
