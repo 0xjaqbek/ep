@@ -23,7 +23,7 @@ service cloud.firestore {
       allow list: if request.auth != null;
     }
 
-        // Courses collection
+    // Courses collection
     match /courses/{courseId} {
       allow read: if true; // Publicly readable
       allow write: if isAdmin();
@@ -43,9 +43,15 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Updated contact_messages rules
     match /contact_messages/{messageId} {
-      allow read, write: if isAdmin();
-      allow create: if true;
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'subject', 'message', 'recaptchaToken', 'createdAt', 'status']) &&
+           request.resource.data.name is string &&
+           request.resource.data.email is string &&
+           request.resource.data.subject is string &&
+           request.resource.data.message is string &&
+           request.resource.data.recaptchaToken is string;
     }
 
     match /orders/{orderId} {
@@ -55,15 +61,11 @@ service cloud.firestore {
         request.resource.data.userId == request.auth.uid;
     }
 
-    // Add this section for app settings
     match /appSettings/{document=**} {
-      // Anyone can read app settings
       allow read: if true;
-      // Only admins can modify settings
       allow write: if isAdmin();
     }
 
-    // Discount codes rules
     match /discountCodes/{codeId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -71,21 +73,15 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['currentUses']);
     }
 
-        // Add this section for payments
     match /payments/{paymentId} {
-      // Allow users to read their own payments and admins to read all
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || isAdmin());
-      
-      // Allow users to create payments for themselves
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
-      
-      // Only admins can update or delete payments
       allow update, delete: if isAdmin();
     }
 
-        match /invoices/{invoiceId} {
+    match /invoices/{invoiceId} {
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || isAdmin());
       allow write: if isAdmin();
@@ -99,33 +95,29 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-        match /sequences/{document} {
+    match /sequences/{document} {
       allow read, write: if isAdmin();
     }
 
-        // Add this for sequences collection
     match /sequences/{sequenceId} {
       allow read, write: if isAdmin();
     }
 
-    // Add this for invoiceCounters if you're using them
     match /invoiceCounters/{document} {
       allow read, write: if isAdmin();
     }
 
-    // Add this for batch operations
     match /{path=**}/sequences/{document} {
       allow read, write: if isAdmin();
     }
 
-    // Add this for notifications if you're using them
     match /notifications/{notificationId} {
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || isAdmin());
       allow write: if isAdmin();
     }
 
-        match /quizzes/{quizId} {
+    match /quizzes/{quizId} {
       allow read: if request.auth != null;
     }
   }
