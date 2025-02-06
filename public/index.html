@@ -35,54 +35,64 @@
 
     <!-- Enhanced Schema Markup -->
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "name": "Progres999",
-        "url": "https://progres999.pl",
-        "description": "Platforma edukacyjna dla ratowników medycznych oferująca profesjonalne kursy online z certyfikatami.",
-        "address": {
-            "@type": "PostalAddress",
-            "addressCountry": "PL",
-            "addressLocality": "Warszawa",
-            "postalCode": "00-001",
-            "streetAddress": "ul. Przykładowa 1/2"
-        },
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://progres999.pl/logoEP.png"
-        },
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer service",
-            "email": "jaqbek.eth@gmail.com",
-            "telephone": "+48 607 999 313",
-            "availableLanguage": ["Polish"]
-        },
-        "sameAs": [
-            "https://facebook.com/progres999",
-            "https://linkedin.com/company/progres999"
-        ],
-        "offers": {
-            "@type": "Offer",
-            "description": "Profesjonalne kursy medyczne z certyfikatami",
-            "priceCurrency": "PLN",
-            "availability": "http://schema.org/InStock",
-            "educationalCredentialAwarded": "Certyfikat ukończenia kursu"
-        },
-        "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Kursy Ratownictwa Medycznego",
-            "itemListElement": [
-                {
-                    "@type": "Course",
-                    "name": "Kurs Podstawowy Ratownictwa",
-                    "description": "Podstawy ratownictwa medycznego",
-                    "provider": "Progres999"
-                }
-            ]
+        {
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "name": "Progres999",
+            "url": "https://progres999.pl",
+            "description": "Platforma edukacyjna dla ratowników medycznych oferująca profesjonalne kursy online z certyfikatami.",
+            "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "PL",
+                "addressLocality": "Warszawa",
+                "postalCode": "00-001",
+                "streetAddress": "ul. Przykładowa 1/2"
+            },
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://progres999.pl/logoEP.png"
+            },
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "email": "jaqbek.eth@gmail.com",
+                "telephone": "+48 607 999 313",
+                "availableLanguage": ["Polish"]
+            },
+            "sameAs": [
+                "https://facebook.com/progres999",
+                "https://linkedin.com/company/progres999"
+            ],
+            "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Kursy Ratownictwa Medycznego",
+                "itemListElement": [
+                    {
+                        "@type": "Course",
+                        "name": "Kurs Podstawowy Ratownictwa",
+                        "description": "Podstawy ratownictwa medycznego",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "Progres999",
+                            "url": "https://progres999.pl"
+                        },
+                        "hasCourseInstance": {
+                            "@type": "CourseInstance",
+                            "courseMode": "online",
+                            "endDate": "2025-12-31",
+                            "startDate": "2024-01-01"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "availability": "http://schema.org/InStock",
+                            "price": "299.00",
+                            "priceCurrency": "PLN",
+                            "validFrom": "2024-01-01"
+                        }
+                    }
+                ]
+            }
         }
-    }
     </script>
 
     <!-- Preload critical assets with improved paths -->
