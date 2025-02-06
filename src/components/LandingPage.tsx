@@ -37,8 +37,19 @@ const LandingPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-black text-white">
-        <p>Loading...</p>
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
+        <div className="text-center">
+          <div className="animate-pulse mb-4">
+            <img 
+              src={logoEP} 
+              alt="Progres999 Logo" 
+              className="mx-auto w-48 h-auto opacity-70"
+            />
+          </div>
+          <p className="text-xl font-light tracking-wider animate-bounce">
+            Ładowanie doświadczenia...
+          </p>
+        </div>
       </div>
     );
   }
@@ -49,71 +60,129 @@ const LandingPage: React.FC = () => {
         title="Strona Główna"
         description="Platforma edukacyjna dla Ratowników Medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
       />
-      <div className="relative min-h-screen">
-        {/* Background Image */}
+      <div className="relative min-h-screen overflow-hidden">
         <div 
-          className="absolute inset-0 w-full h-full bg-center bg-cover transition-all duration-1000"
+          className="absolute inset-0 w-full h-full bg-center bg-cover transition-all duration-1000 ease-in-out"
           style={{
             backgroundImage: `url(${backgroundImages[currentIndex]})`,
-            filter: 'blur(5px) brightness(0.4)',
+            filter: 'brightness(0.5) contrast(1.1) opacity(85%) blur(3px)',
+            transform: 'scale(1.05)',
+            backgroundBlendMode: 'multiply',
           }}
         />
 
-        {/* Main Content */}
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 text-center text-white">
-          {/* Content wrapper */}
-          <div className="max-w-4xl mx-auto">
-            {/* Logo */}
-            <img
-              src={logoEP}
-              alt="EP Logo"
-              width="256"
-              height="auto"
-              className="w-64 h-auto mb-4 mx-auto"
-              loading="eager"
-              fetchPriority="high"
-            />
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-blue-900/70 to-indigo-900/70 
+          mix-blend-overlay"
+        />
 
-            {/* Headline */}
-            <div className="mb-6">
-              <h1 className="text-xl font-light text-gray-200">Twoja wiedza, ich życie</h1>
-              <h2 className="text-lg font-bold text-gray-300">– rozwijaj się z nami.</h2>
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <div 
+              className="mb-8 transform transition-all duration-700 
+              hover:scale-105 hover:rotate-2"
+            >
+              <img
+                src={logoEP}
+                alt="Progres999 Logo"
+                className="mx-auto w-64 h-auto shadow-2xl rounded-xl"
+              />
             </div>
 
-            {/* Description */}
-            <div className="max-w-2xl mx-auto mb-8 space-y-4 text-lg">
-              <p>Witamy na platformie edukacyjnej dla ratowników medycznych,
-              oferującej kursy internetowe z zakresu ratownictwa medycznego, umożliwiające uzyskanie punktów edukacyjnych</p>
-              <p>Nasze kursy są prowadzone przez wykwalifikowaną kadrę dydaktyczną,
-                zapewniając najwyższy poziom kształcenia w dziedzinie ratownictwa medycznego.</p>
-              <p>Po ukończeniu kursów uczestnicy otrzymują certyfikaty potwierdzające zdobyte punkty edukacyjne.</p>
+            <div className="mb-10 space-y-4">
+              <h1 className="text-3xl md:text-4xl font-serif font-bold 
+              text-white">
+                Twoja wiedza, ich życie
+              </h1>
+              <h2 className="text-2xl md:text-3xl font-serif font-light italic 
+              text-blue-200">
+                – rozwijaj się z nami
+              </h2>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
+            <div className="max-w-4xl mx-auto mb-12 space-y-4 text-base md:text-lg">
+              <p className="text-white/90 leading-relaxed">
+                Witamy na platformie edukacyjnej dla ratowników medycznych, oferującej specjalistyczne kursy internetowe z zakresu ratownictwa medycznego, umożliwiające uzyskanie punktów edukacyjnych.
+              </p>
+              <p className="text-white/90 leading-relaxed">
+                Nasze kursy są prowadzone przez wykwalifikowaną kadrę dydaktyczną, zapewniając najwyższy poziom kształcenia w dziedzinie ratownictw medycznego.
+              </p>
+              <p className="text-white/90 leading-relaxed">
+                Po ukończeniu kursów uczestnicy otrzymują certyfikaty potwierdzające zdobyte umiejętności i punkty edukacyjne.
+              </p>
+            </div>
+
+            {/* CTA Buttons moved before Feature Highlights */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
               <Link 
                 to="/courses"
-                className="bg-blue-600 hover:bg-blue-800 text-white text-lg px-8 py-4 rounded-lg transition-all"
+                className="px-8 py-3 bg-blue-600 text-white 
+                rounded-full font-semibold tracking-wide
+                hover:bg-blue-700 transition-all duration-300
+                transform hover:scale-105 hover:shadow-xl"
               >
-                Przeglądaj kursy
+                Odkryj Kursy
               </Link>
               <Link 
                 to="/register"
-                className="bg-white/10 hover:bg-white/20 text-white text-lg px-8 py-4 rounded-lg transition-all"
+                className="px-8 py-3 border-2 border-white text-white 
+                rounded-full font-semibold tracking-wide
+                hover:bg-white hover:text-blue-900 
+                transition-all duration-300
+                transform hover:scale-105"
               >
-                Dołącz do nas
+                Dołącz Teraz
               </Link>
               <button
                 onClick={() => setShowOpinions(true)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-8 py-4 rounded-lg transition-all"
+                className="px-8 py-3 bg-yellow-500 text-black 
+                rounded-full font-semibold tracking-wide
+                hover:bg-yellow-600 transition-all duration-300
+                transform hover:scale-105 hover:shadow-xl"
               >
-                Zobacz opinie
+                Opinie Użytkowników
               </button>
+            </div>
+
+            {/* Feature Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {[
+                { 
+                  title: "Certyfikowane Kursy", 
+                  icon: "🏆",
+                  description: "Zdobądź punkty edukacyjne" 
+                },
+                { 
+                  title: "Elastyczna Nauka", 
+                  icon: "🕒",
+                  description: "Ucz się w dowolnym czasie" 
+                },
+                { 
+                  title: "Isntruktorzy", 
+                  icon: "🚑",
+                  description: "Z wieloletnim doświadczeniem zawodowym" 
+                }
+              ].map((feature, index) => (
+                <div 
+                  key={index}
+                  className="bg-white/10 backdrop-blur-md rounded-xl p-6 
+                  border border-white/20 hover:border-white/40 
+                  transition-all duration-300 transform hover:-translate-y-2 
+                  hover:shadow-2xl"
+                >
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">
+                    {feature.title}
+                  </h3>
+                  <p className="text-blue-100 text-sm">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Lazy load opinions dialog */}
         <Suspense fallback={null}>
           {showOpinions && <OpinionsDialog isOpen={showOpinions} onClose={() => setShowOpinions(false)} />}
         </Suspense>

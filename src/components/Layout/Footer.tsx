@@ -15,10 +15,10 @@ export const Footer = () => {
                 className="w-32 h-auto" // Adjusted size to be more appropriate for footer
               />
             </div>
-            <p className="text-sm font-light text-gray-400">
+            <p className="text-sm font-light text-gray-400 tracking-tight">
               Twoja wiedza, ich życie
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 tracking-wide">
               –rozwijaj się z nami.
             </p>
           </div>
@@ -27,8 +27,8 @@ export const Footer = () => {
             <h3 className="font-bold mb-4">Kursy</h3>
             <ul className="space-y-2">
               <li><Link to="/courses" className="text-gray-400 hover:text-white">Wszystkie kursy</Link></li>
-              <li><Link to="/courses" className="text-gray-400 hover:text-white">Ratownictwo medyczne</Link></li>
-              <li><Link to="/courses" className="text-gray-400 hover:text-white">Pierwsza pomoc</Link></li>
+              <li><Link to="/courses" className="text-gray-400 hover:text-white">Quizy</Link></li>
+              <li><Link to="/faq" className="text-gray-400 hover:text-white">Często zadawane pytania</Link></li>
             </ul>
           </div>
 
@@ -38,7 +38,6 @@ export const Footer = () => {
               <li><Link to="/about" className="text-gray-400 hover:text-white">Kim jesteśmy</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-white">Kontakt</Link></li>
               <li><Link to="/regulations" className="text-gray-400 hover:text-white">Regulamin</Link></li>
-              <li><Link to="/faq" className="text-gray-400 hover:text-white">Często zadawane pytania</Link></li>
             </ul>
           </div>
 

@@ -72,11 +72,11 @@ export const Header: React.FC = () => {
               className="text-2xl font-extrabold text-blue-600 leading-tight"
             >
               Progres<span className="text-blue-800 inline-block">999</span>
-              <p className="text-sm font-light text-gray-900">
+              <p className="text-sm font-light text-gray-900 tracking-tighter">
                 Twoja wiedza, ich życie
               </p>
-              <p className="text-sm text-gray-600">
-                –rozwijaj się z nami.
+              <p className="text-sm text-gray-600 tracking-wide">
+                –rozwijaj się z nami
               </p>
             </Link>
           </div>
