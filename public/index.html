@@ -80,14 +80,22 @@
                             "@type": "CourseInstance",
                             "courseMode": "online",
                             "endDate": "2025-12-31",
-                            "startDate": "2024-01-01"
+                            "startDate": "2024-01-01",
+                            "courseWorkload": "PT3H",
+                            "courseSchedule": {
+                                "@type": "Schedule",
+                                "name": "Dostęp do kursu 24/7, możliwość realizacji w dowolnym tempie",
+                                "repeatCount": -1,
+                                "repeatFrequency": "Daily"
+                            }
                         },
                         "offers": {
                             "@type": "Offer",
                             "availability": "http://schema.org/InStock",
                             "price": "299.00",
                             "priceCurrency": "PLN",
-                            "validFrom": "2024-01-01"
+                            "validFrom": "2024-01-01",
+                            "category": "Ratownictwo medyczne"
                         }
                     }
                 ]
@@ -105,9 +113,32 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
 
-    <!-- Apple & Favicons -->
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/favicon-96x96.png">
+
+    <!-- Icon sizes you have -->
+    <link rel="icon" type="image/png" sizes="48x48" href="%PUBLIC_URL%/icon-48x48.png">
+    <link rel="icon" type="image/png" sizes="72x72" href="%PUBLIC_URL%/icon-72x72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="%PUBLIC_URL%/icon-128x128.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="%PUBLIC_URL%/icon-144x144.png">
+    <link rel="icon" type="image/png" sizes="152x152" href="%PUBLIC_URL%/icon-152x152.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="%PUBLIC_URL%/icon-256x256.png">
+    <link rel="icon" type="image/png" sizes="384x384" href="%PUBLIC_URL%/icon-384x384.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="%PUBLIC_URL%/icon-512x512.png">
+
+    <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/icon-256x256.png">
+    <link rel="apple-touch-icon-precomposed" href="%PUBLIC_URL%/apple-icon-precomposed.png">
+
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileColor" content="#0066cc">
+    <meta name="msapplication-TileImage" content="%PUBLIC_URL%/ms-icon-70x70.png">
+
+    <!-- PWA Support -->
+    <link rel="mask-icon" href="%PUBLIC_URL%/maskable-icon.png" color="#0066cc">
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
