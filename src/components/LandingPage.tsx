@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
     <>
       <SEO 
         title="Strona Główna"
-        description="Platforma edukacyjna dla zawodów medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
+        description="Platforma edukacyjna dla Ratowników Medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
       />
       <div className="relative min-h-screen">
         {/* Background Image */}
@@ -82,8 +82,8 @@ const LandingPage: React.FC = () => {
 
             {/* Description */}
             <div className="max-w-2xl mx-auto mb-8 space-y-4 text-lg">
-              <p>Witamy na platformie edukacyjnej dedykowanej ratownikom medycznym,
-                oferującej specjalistyczne kursy internetowe z zakresu ratownictwa medycznego.</p>
+              <p>Witamy na platformie edukacyjnej dla ratowników medycznych,
+              oferującej kursy internetowe z zakresu ratownictwa medycznego, umożliwiające uzyskanie punktów edukacyjnych</p>
               <p>Nasze kursy są prowadzone przez wykwalifikowaną kadrę dydaktyczną,
                 zapewniając najwyższy poziom kształcenia w dziedzinie ratownictwa medycznego.</p>
               <p>Po ukończeniu kursów uczestnicy otrzymują certyfikaty potwierdzające zdobyte punkty edukacyjne.</p>
