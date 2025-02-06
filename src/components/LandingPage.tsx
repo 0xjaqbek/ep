@@ -49,7 +49,7 @@ const LandingPage: React.FC = () => {
         title="Strona Główna"
         description="Platforma edukacyjna dla zawodów medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
       />
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative min-h-screen">
         {/* Background Image */}
         <div 
           className="absolute inset-0 w-full h-full bg-center bg-cover transition-all duration-1000"
@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
         />
 
         {/* Main Content */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 text-center text-white">
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 text-center text-white">
           {/* Content wrapper */}
           <div className="max-w-4xl mx-auto">
             {/* Logo */}
@@ -90,7 +90,7 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
               <Link 
                 to="/courses"
                 className="bg-blue-600 hover:bg-blue-800 text-white text-lg px-8 py-4 rounded-lg transition-all"
