@@ -38,6 +38,7 @@ export const Footer = () => {
               <li><Link to="/about" className="text-gray-400 hover:text-white">Kim jesteśmy</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-white">Kontakt</Link></li>
               <li><Link to="/regulations" className="text-gray-400 hover:text-white">Regulamin</Link></li>
+              <li><Link to="/faq" className="text-gray-400 hover:text-white">Często zadawane pytania</Link></li>
             </ul>
           </div>
 

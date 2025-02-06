@@ -21,6 +21,7 @@ const UserInvoiceComponent = React.lazy(() => import('../components/User/UserInv
 const Quiz = React.lazy(() => import('../components/Quiz/Quiz.tsx'));
 const Quiz1 = React.lazy(() => import('../components/Quiz/Quiz1.tsx'));
 const Quiz2 = React.lazy(() => import('../components/Quiz/Quiz2.tsx'));
+const FAQ = React.lazy(() => import('../components/FAQ.tsx'));
 
 // Admin components
 const AdminLayout = React.lazy(() => import('../components/Admin/AdminLayout.tsx'));
@@ -58,6 +59,7 @@ export const LazyLoadedRoutes: React.FC = () => {
               <Route path="about" element={<About />} />
               <Route path="contact" element={<Contact />} />
               <Route path="regulations" element={<Regulations />} />
+              <Route path="faq" element={<FAQ />} />
               
               {/* Protected User Routes */}
               <Route path="account" element={<UserAccount />} />
