@@ -72,7 +72,7 @@ const LandingPage: React.FC = () => {
         />
 
         <div 
-          className="absolute inset-0 bg-gradient-to-br from-blue-900/70 to-indigo-900/70 
+          className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-indigo-900/20 
           mix-blend-overlay"
         />
 
