@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
             />
           </div>
           <p className="text-xl font-light tracking-wider animate-bounce">
-            Ładowanie doświadczenia...
+            Ładowanie...
           </p>
         </div>
       </div>
