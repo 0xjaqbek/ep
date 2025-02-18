@@ -22,6 +22,7 @@ const Quiz = React.lazy(() => import('../components/Quiz/Quiz.tsx'));
 const Quiz1 = React.lazy(() => import('../components/Quiz/Quiz1.tsx'));
 const Quiz2 = React.lazy(() => import('../components/Quiz/Quiz2.tsx'));
 const FAQ = React.lazy(() => import('../components/FAQ.tsx'));
+const ResetPassword = React.lazy(() => import('../components/ResetPassword'));
 
 // Admin components
 const AdminLayout = React.lazy(() => import('../components/Admin/AdminLayout.tsx'));
@@ -60,6 +61,7 @@ export const LazyLoadedRoutes: React.FC = () => {
               <Route path="contact" element={<Contact />} />
               <Route path="regulations" element={<Regulations />} />
               <Route path="faq" element={<FAQ />} />
+              <Route path="reset-password" element={<ResetPassword />} />
               
               {/* Protected User Routes */}
               <Route path="account" element={<UserAccount />} />
