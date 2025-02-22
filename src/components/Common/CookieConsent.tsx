@@ -23,6 +23,12 @@ const COOKIE_TYPES = {
   }
 };
 
+declare global {
+  interface Window {
+    showCookieConsent?: () => void;
+  }
+}
+
 const CookieConsent = () => {
   const [showConsent, setShowConsent] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -34,19 +40,37 @@ const CookieConsent = () => {
   });
 
   useEffect(() => {
+    // Add the function to window object
+    window.showCookieConsent = () => {
+      setShowConsent(true);
+    };
+
+    // Check for saved consent
     const savedConsent = localStorage.getItem('cookieConsent');
     if (!savedConsent) {
       setTimeout(() => setShowConsent(true), 1000);
     } else {
       setConsents(JSON.parse(savedConsent));
     }
+
+    // Cleanup
+    return () => {
+      window.showCookieConsent = undefined;
+    };
   }, []);
+
+  type ConsentTypes = {
+    necessary: boolean;
+    functional: boolean;
+    analytics: boolean;
+    marketing: boolean;
+  };
 
   const handleAcceptAll = () => {
     const allConsents = Object.keys(COOKIE_TYPES).reduce((acc, key) => ({
       ...acc,
       [key]: true
-    }), {});
+    }), {} as ConsentTypes);
     
     saveConsents(allConsents);
   };
@@ -65,17 +89,14 @@ const CookieConsent = () => {
     saveConsents(minimalConsents);
   };
 
-  const saveConsents = (selectedConsents) => {
+  const saveConsents = (selectedConsents: typeof consents) => {
     localStorage.setItem('cookieConsent', JSON.stringify(selectedConsents));
     setConsents(selectedConsents);
     setShowConsent(false);
 
-    // Przykład implementacji Google Analytics
     if (selectedConsents.analytics) {
-      // Włącz GA
       window['ga-disable-GA_MEASUREMENT_ID'] = false;
     } else {
-      // Wyłącz GA
       window['ga-disable-GA_MEASUREMENT_ID'] = true;
     }
   };
@@ -84,15 +105,11 @@ const CookieConsent = () => {
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" />
-
-      {/* Cookie consent modal */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg z-50">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col space-y-4">
             {!showDetails ? (
-              // Simple view
               <>
                 <div className="prose">
                   <h2 className="text-xl font-semibold mb-2">Dbamy o Twoją prywatność</h2>
@@ -125,7 +142,6 @@ const CookieConsent = () => {
                 </div>
               </>
             ) : (
-              // Detailed view
               <>
                 <div className="prose">
                   <h2 className="text-xl font-semibold mb-2">Ustawienia plików cookies</h2>
@@ -142,7 +158,7 @@ const CookieConsent = () => {
                         <input
                           type="checkbox"
                           id={key}
-                          checked={consents[key]}
+                          checked={consents[key as keyof typeof consents]}
                           onChange={(e) => setConsents(prev => ({
                             ...prev,
                             [key]: e.target.checked

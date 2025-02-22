@@ -1,17 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState } from 'react';
 import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config.ts';
 import { useAuth } from './Auth/AuthProvider.tsx';
 import SEO from './SEO.tsx';
-
-declare global {
-  interface Window {
-    grecaptcha: {
-      ready: (callback: () => void) => void;
-      execute: (siteKey: string, options: { action: string }) => Promise<string>;
-    };
-  }
-}
 
 const Contact = () => {
   const { currentUser } = useAuth();
@@ -26,31 +17,12 @@ const Contact = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const recaptchaScriptLoaded = useRef(false);
 
-  const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '';
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ type: null, message: '' });
 
-  useEffect(() => {
-    if (!recaptchaScriptLoaded.current) {
-      // Load the reCAPTCHA script only once
-      const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        recaptchaScriptLoaded.current = true;
-      };
-      document.head.appendChild(script);
-
-      return () => {
-        // Cleanup script on unmount if needed
-        const scripts = document.querySelectorAll(`script[src^="https://www.google.com/recaptcha/api.js"]`);
-        scripts.forEach(script => script.remove());
-      };
-    }
-  }, [RECAPTCHA_SITE_KEY]);
-
-  const handleFormSubmission = async (token: string) => {
     try {
       const contactData = {
         name: formData.name,
@@ -59,8 +31,7 @@ const Contact = () => {
         message: formData.message,
         userId: currentUser?.uid || null,
         createdAt: serverTimestamp(),
-        status: 'new',
-        recaptchaToken: token
+        status: 'new'
       };
 
       await addDoc(collection(db, 'contact_messages'), contactData);
@@ -83,36 +54,6 @@ const Contact = () => {
         message: 'Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie później.'
       });
     } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!recaptchaScriptLoaded.current) {
-      setStatus({
-        type: 'error',
-        message: 'Proszę poczekać na załadowanie wszystkich komponentów.'
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setStatus({ type: null, message: '' });
-
-    try {
-      await window.grecaptcha.ready(async () => {
-        const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {
-          action: 'submit_contact'
-        });
-        await handleFormSubmission(token);
-      });
-    } catch (error) {
-      console.error('reCAPTCHA error:', error);
-      setStatus({
-        type: 'error',
-        message: 'Wystąpił błąd podczas weryfikacji. Spróbuj ponownie później.'
-      });
       setIsSubmitting(false);
     }
   };
