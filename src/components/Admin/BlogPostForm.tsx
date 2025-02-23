@@ -52,13 +52,13 @@ interface FormValues {
 }
 
 interface BlogPostFormProps {
-  initialPost?: BlogPost;
-  onSave: () => void;
-  onCancel: () => void;
+    initialPost?: BlogPost | null;  // Allow null
+    onSave: () => void;
+    onCancel: () => void;
 }
 
 export const BlogPostForm: React.FC<BlogPostFormProps> = ({ 
-  initialPost, 
+  initialPost = null, 
   onSave, 
   onCancel 
 }) => {

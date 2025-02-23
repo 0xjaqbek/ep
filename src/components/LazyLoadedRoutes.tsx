@@ -45,9 +45,8 @@ const DiscountManagement = React.lazy(() => import('../components/Admin/Discount
 const BlogPostManagement = React.lazy(() => import('../components/Admin/BlogPostManagement.tsx'));
 const BlogPostFormComponent = React.lazy(() => import('../components/Admin/BlogPostForm.tsx'));
 
-// Wrapper component for BlogPostForm
 const BlogPostForm = React.lazy(() => {
-  const Wrapper = () => {
+  const Wrapper: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
 
@@ -59,14 +58,15 @@ const BlogPostForm = React.lazy(() => {
       navigate('/admin/blog-posts');
     };
 
+    // Use null if no id is present
     const initialPost = id 
-      ? ({ id } as BlogPost) 
-      : undefined;
+      ? { id } as BlogPost 
+      : null;
 
     return (
       <Suspense fallback={<LoadingSpinner size="large" />}>
         <BlogPostFormComponent 
-          initialPost={initialPost || null} 
+          initialPost={initialPost} 
           onSave={handleSave} 
           onCancel={handleCancel} 
         />
