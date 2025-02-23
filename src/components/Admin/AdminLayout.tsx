@@ -82,6 +82,12 @@ const AdminLayout: React.FC = () => {
           >
             Ustawienia
           </Link>
+          <Link
+            to="/admin/blog-posts"
+            className={`block p-4 hover:bg-blue-700 ${isActive('/admin/blog-posts')}`}
+          >
+            Zarządzanie blogiem
+          </Link>
         </nav>
       </aside>
 

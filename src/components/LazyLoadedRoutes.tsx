@@ -1,6 +1,8 @@
+// src/components/LazyLoadedRoutes.tsx
 import React, { Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { LoadingSpinner } from '../components/Loading/LoadingSpinner.tsx';
+import { BlogPost } from '../types/blog.ts';
 
 // Lazy load components
 const LandingPage = React.lazy(() => import('../components/LandingPage.tsx'));
@@ -40,6 +42,40 @@ const OpinionsManagement = React.lazy(() => import('../components/Admin/Opinions
 const InvoiceManagement = React.lazy(() => import('../components/Admin/InvoiceManagement.tsx'));
 const Settings = React.lazy(() => import('../components/Admin/Settings.tsx'));
 const DiscountManagement = React.lazy(() => import('../components/Admin/DiscountManagement.tsx'));
+const BlogPostManagement = React.lazy(() => import('../components/Admin/BlogPostManagement.tsx'));
+const BlogPostFormComponent = React.lazy(() => import('../components/Admin/BlogPostForm.tsx'));
+
+// Wrapper component for BlogPostForm
+const BlogPostForm = React.lazy(() => {
+  const Wrapper = () => {
+    const navigate = useNavigate();
+    const { id } = useParams<{ id?: string }>();
+
+    const handleSave = () => {
+      navigate('/admin/blog-posts');
+    };
+
+    const handleCancel = () => {
+      navigate('/admin/blog-posts');
+    };
+
+    const initialPost = id 
+      ? ({ id } as BlogPost) 
+      : undefined;
+
+    return (
+      <Suspense fallback={<LoadingSpinner size="large" />}>
+        <BlogPostFormComponent 
+          initialPost={initialPost || null} 
+          onSave={handleSave} 
+          onCancel={handleCancel} 
+        />
+      </Suspense>
+    );
+  };
+
+  return Promise.resolve({ default: Wrapper });
+});
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -99,6 +135,9 @@ export const LazyLoadedRoutes: React.FC = () => {
                 <Route path="settings" element={<Settings />} />
                 <Route path="discounts" element={<DiscountManagement />} />
                 <Route path="invoices" element={<InvoiceManagement />} />
+                <Route path="blog-posts" element={<BlogPostManagement />} />
+                <Route path="blog-posts/view/:id" element={<BlogPostView />} />
+                <Route path="blog-posts/edit/:id" element={<BlogPostForm />} />
               </Route>
             </Routes>
           </main>

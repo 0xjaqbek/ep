@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../Auth/AuthProvider.tsx';
-import logoEP from '../../assets/logoEP.webp';
 
 export const BlogHeader: React.FC = () => {
   const { currentUser } = useAuth();
@@ -12,7 +11,7 @@ export const BlogHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
-          <Link to="/" className="flex flex-col">
+          <Link to="https://blog.progres999.pl" className="flex flex-col">
             <div className="text-2xl font-extrabold text-blue-600 leading-tight">
               Progres<span className="text-blue-800">999</span>
             </div>
@@ -27,28 +26,16 @@ export const BlogHeader: React.FC = () => {
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
             <Link 
-              to="/"
+              to="https://blog.progres999.pl"
               className="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium"
             >
               Strona główna
             </Link>
             <Link 
-              to="/category/ratownictwo"
+              to="https://progres999.pl/courses"
               className="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium"
             >
-              Ratownictwo
-            </Link>
-            <Link 
-              to="/category/pierwsza-pomoc"
-              className="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium"
-            >
-              Pierwsza Pomoc
-            </Link>
-            <Link 
-              to="/category/szkolenia"
-              className="text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium"
-            >
-              Szkolenia
+              Kursy
             </Link>
           </nav>
 
