@@ -3,7 +3,8 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "hosting": {
+  "hosting": [{
+    "target": "main",
     "public": "build",
     "ignore": [
       "firebase.json",
@@ -83,6 +84,21 @@
       }
     ]
   },
+  {
+    "target": "blog",
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }],
   "storage": {
     "rules": "storage.rules"
   }

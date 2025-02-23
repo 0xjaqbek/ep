@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logoEP from '../../assets/logoEP.webp';
 
-// Enhanced Footer Component
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-900">
@@ -18,7 +17,7 @@ export const Footer: React.FC = () => {
               <p className="text-sm font-light text-gray-400">
                 Twoja wiedza, ich życie
               </p>
-              <p className="text-sm text-gray-500 italic">
+              <p className="text-sm text-gray-200 font-black">
                 –rozwijaj się z nami
               </p>
             </div>
@@ -142,29 +141,15 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Copyright Section */}
-        <div className="border-t border-gray-800 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} Progres999. Wszelkie prawa zastrzeżone.
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/regulations" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Regulamin
-              </Link>
-              <button 
-                onClick={() => {
-                  // This assumes you have a CookieConsent component that exposes a show() method
-                  // You'll need to implement this via your state management
-                  window.showCookieConsent?.();
-                }} 
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Polityka Prywatności
-              </button>
-              <Link to="/contact" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Kontakt
-              </Link>
-            </div>
+        <div className="border-t border-gray-800 py-6 text-center">
+          <div className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} 
+            <img 
+              src={logoEP} 
+              alt="EP Logo" 
+              className="inline-block h-4 w-auto mx-1" 
+            /> 
+            Wszelkie prawa zastrzeżone.
           </div>
         </div>
 

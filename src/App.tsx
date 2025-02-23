@@ -6,7 +6,7 @@ import { Header } from './components/Layout/Header.tsx';
 import { Footer } from './components/Layout/Footer.tsx';
 import { CartProvider } from './contexts/CartContext.tsx';
 import { HelmetProvider } from 'react-helmet-async';
-import LazyLoadedRoutes from './components/LazyLoadedRoutes.tsx';
+import DomainRouter from './components/DomainRouter.tsx';
 
 // Lazy load CookieConsent
 const CookieConsent = React.lazy(() => import('./components/Common/CookieConsent.tsx'));
@@ -22,7 +22,7 @@ const App: React.FC = () => {
                 <Header />
                 <main className="flex-1">
                   <Suspense>
-                    <LazyLoadedRoutes />
+                    <DomainRouter />
                   </Suspense>
                 </main>
                 <Suspense fallback={null}>

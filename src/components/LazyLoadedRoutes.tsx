@@ -23,6 +23,9 @@ const Quiz1 = React.lazy(() => import('../components/Quiz/Quiz1.tsx'));
 const Quiz2 = React.lazy(() => import('../components/Quiz/Quiz2.tsx'));
 const FAQ = React.lazy(() => import('../components/FAQ.tsx'));
 const ResetPassword = React.lazy(() => import('../components/ResetPassword.tsx'));
+const BlogList = React.lazy(() => import('../components/Blog/BlogList.tsx'));
+const BlogPostView = React.lazy(() => import('../components/Blog/BlogPostView.tsx'));
+const BlogLayout = React.lazy(() => import('../components/Blog/BlogLayout.tsx'));
 
 // Admin components
 const AdminLayout = React.lazy(() => import('../components/Admin/AdminLayout.tsx'));
@@ -45,12 +48,19 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Lazy loaded routes component
 export const LazyLoadedRoutes: React.FC = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        
+        {/* Blog Routes */}
+        <Route path="/blog" element={<BlogLayout />}>
+          <Route index element={<BlogList />} />
+          <Route path=":slug" element={<BlogPostView />} />
+        </Route>
+
+        {/* Other Routes */}
         <Route path="/*" element={
           <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <Routes>
@@ -70,11 +80,11 @@ export const LazyLoadedRoutes: React.FC = () => {
               <Route path="payment/callback" element={<PaymentCallback />} />
               <Route path="payment/checkout" element={<PaymentForm />} />
               <Route path="payment/success" element={<PaymentSuccess />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/account/invoices" element={<UserInvoiceComponent />} />
-              <Route path="/quiz" element={<Quiz />} />
-              <Route path="/quiz1" element={<Quiz1 />} />
-              <Route path="/quiz2" element={<Quiz2 />} />
+              <Route path="checkout" element={<Checkout />} />
+              <Route path="account/invoices" element={<UserInvoiceComponent />} />
+              <Route path="quiz" element={<Quiz />} />
+              <Route path="quiz1" element={<Quiz1 />} />
+              <Route path="quiz2" element={<Quiz2 />} />
 
               {/* Protected Admin Routes */}
               <Route path="admin" element={<AdminLayout />}>

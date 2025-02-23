@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "punkty999-31eff"
+  },
+  "targets": {
+    "punkty999-31eff": {
+      "hosting": {
+        "main": ["punkty999-31eff"],
+        "blog": ["blog-punkty999-31eff"]
+      }
+    }
   }
 }
