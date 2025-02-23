@@ -23,28 +23,19 @@ export interface BlogPost {
     };
   }
   
-  export interface BlogCategory {
-    id: string;
-    name: string;
-    slug: string;
-    description?: string;
+  export interface BlogFormValues {
+    title: string;
+    content: string;
+    excerpt: string;
+    categories: string[];
+    tags: string[];
+    seoTitle: string;
+    seoDescription: string;
+    coverImage: File | null;
   }
   
-  export interface BlogTag {
-    id: string;
-    name: string;
-    slug: string;
-  }
-  
-  export interface BlogAuthor {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-    bio: string;
-    socialLinks?: {
-      twitter?: string;
-      linkedin?: string;
-      facebook?: string;
-    };
+  export interface BlogFormProps {
+    initialPost?: BlogPost | null;
+    onSave: () => void;
+    onCancel: () => void;
   }

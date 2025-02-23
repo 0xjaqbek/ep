@@ -81,21 +81,28 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
     values: FormValues, 
     { setSubmitting, setErrors }: FormikHelpers<FormValues>
   ) => {
+    console.log('Form submission started', { values }); // Debug log
+    console.log('Current user:', currentUser); // Debug log
     try {
+      console.log('Starting form submission...'); // Debug log
+      setSubmitting(true);
+
       // Validate user is authenticated and is an admin
       if (!currentUser || currentUser.role !== 'admin') {
-        throw new Error('Brak uprawnień');
+        throw new Error('Brak uprawnień administratora');
       }
 
       // Upload cover image if a new one is selected
       let coverImageUrl = initialPost?.coverImage || '';
       if (coverImageFile) {
+        console.log('Uploading cover image...'); // Debug log
         const imageRef = ref(
           storage, 
           `blog_images/${Date.now()}_${coverImageFile.name}`
         );
         const snapshot = await uploadBytes(imageRef, coverImageFile);
         coverImageUrl = await getDownloadURL(snapshot.ref);
+        console.log('Cover image uploaded:', coverImageUrl); // Debug log
       }
 
       // Prepare post data
@@ -113,8 +120,8 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         publishedAt: initialPost?.publishedAt || new Date(),
         updatedAt: new Date(),
         author: {
-          id: currentUser.uid || '',
-          name: currentUser.displayName || 'Administrator',
+          id: currentUser?.uid || '',  // Ensure id is always a string
+          name: currentUser?.displayName || 'Administrator',
           avatar: '', 
           bio: '' 
         },
@@ -125,24 +132,29 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         }
       };
 
+      console.log('Saving post data:', postData); // Debug log
+
       // Save or update the post
       if (initialPost) {
         // Update existing post
         const postRef = doc(db, 'blog_posts', initialPost.id);
         await updateDoc(postRef, postData);
+        console.log('Post updated successfully'); // Debug log
       } else {
         // Create new post
-        await addDoc(collection(db, 'blog_posts'), postData);
+        const docRef = await addDoc(collection(db, 'blog_posts'), postData);
+        console.log('New post created with ID:', docRef.id); // Debug log
       }
 
       // Call onSave callback
       onSave();
-      setSubmitting(false);
     } catch (error) {
       console.error('Error saving blog post:', error);
       setErrors({ 
-        title: error instanceof Error ? error.message : 'Wystąpił błąd' 
+        title: error instanceof Error ? error.message : 'Wystąpił błąd podczas zapisywania wpisu' 
       });
+      throw error; // Re-throw to trigger error handling
+    } finally {
       setSubmitting(false);
     }
   };

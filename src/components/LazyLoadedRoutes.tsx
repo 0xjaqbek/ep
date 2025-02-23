@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { LoadingSpinner } from '../components/Loading/LoadingSpinner.tsx';
 import { BlogPost } from '../types/blog.ts';
+import { BlogForm } from './BlogForm.tsx';
 
 // Lazy load components
 const LandingPage = React.lazy(() => import('../components/LandingPage.tsx'));
@@ -43,7 +44,7 @@ const InvoiceManagement = React.lazy(() => import('../components/Admin/InvoiceMa
 const Settings = React.lazy(() => import('../components/Admin/Settings.tsx'));
 const DiscountManagement = React.lazy(() => import('../components/Admin/DiscountManagement.tsx'));
 const BlogPostManagement = React.lazy(() => import('../components/Admin/BlogPostManagement.tsx'));
-const BlogPostFormComponent = React.lazy(() => import('../components/Admin/BlogPostForm.tsx'));
+const BlogPostFormComponent = React.lazy(() => import('../components/Admin/BlogForm.tsx'));
 
 const BlogPostForm = React.lazy(() => {
   const Wrapper: React.FC = () => {
