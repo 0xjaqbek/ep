@@ -208,7 +208,76 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               )}
             </div>
 
-            {/* Render the rest of the form as before */}
+            <div>
+                <label htmlFor="content" className="block mb-2">Treść wpisu</label>
+                <Field name="content" as="textarea" className={`w-full p-2 border rounded ${touched.content && errors.content ? 'border-red-500' : ''}`} />
+                {touched.content && errors.content && (
+                    <div className="text-red-500 text-sm mt-1">{errors.content}</div>
+                )}
+                </div>
+
+                <div>
+                <label htmlFor="excerpt" className="block mb-2">Krótki opis</label>
+                <Field name="excerpt" as="textarea" className={`w-full p-2 border rounded ${touched.excerpt && errors.excerpt ? 'border-red-500' : ''}`} />
+                {touched.excerpt && errors.excerpt && (
+                    <div className="text-red-500 text-sm mt-1">{errors.excerpt}</div>
+                )}
+                </div>
+
+                <div>
+                <label className="block mb-2">Kategorie</label>
+                {categories.map(cat => (
+                    <label key={cat} className="mr-4">
+                    <Field type="checkbox" name="categories" value={cat} />
+                    {cat}
+                    </label>
+                ))}
+                {touched.categories && errors.categories && (
+                    <div className="text-red-500 text-sm mt-1">{errors.categories}</div>
+                )}
+                </div>
+
+                <div>
+                    <label htmlFor="tags" className="block mb-2">Tagi</label>
+                    <Field name="tags">
+                        {({ field, form }: any) => (
+                        <input
+                            type="text"
+                            placeholder="Oddziel tagi przecinkami"
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => {
+                            const tags = e.target.value
+                                .split(',')
+                                .map(tag => tag.trim())
+                                .filter(tag => tag);
+                            form.setFieldValue('tags', tags);
+                            }}
+                            className="w-full p-2 border rounded"
+                        />
+                        )}
+                    </Field>
+                    {touched.tags && errors.tags && (
+                        <div className="text-red-500 text-sm mt-1">{errors.tags}</div>
+                    )}
+                    </div>
+
+
+                <div>
+                <label htmlFor="seoTitle" className="block mb-2">SEO Tytuł</label>
+                <Field name="seoTitle" type="text" className="w-full p-2 border rounded" />
+                </div>
+
+                <div>
+                <label htmlFor="seoDescription" className="block mb-2">SEO Opis</label>
+                <Field name="seoDescription" as="textarea" className="w-full p-2 border rounded" />
+                </div>
+
+                <div>
+                <label htmlFor="coverImage" className="block mb-2">Obrazek nagłówkowy</label>
+                <input type="file" name="coverImage" onChange={handleImageChange} className="w-full" />
+                {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 max-h-48" />}
+                </div>
+
             
             {/* Action Buttons */}
             <div className="flex justify-end space-x-4 mt-6">

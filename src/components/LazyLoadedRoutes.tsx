@@ -137,6 +137,7 @@ export const LazyLoadedRoutes: React.FC = () => {
                 <Route path="invoices" element={<InvoiceManagement />} />
                 <Route path="blog-posts" element={<BlogPostManagement />} />
                 <Route path="blog-posts/view/:id" element={<BlogPostView />} />
+                <Route path="blog-posts/edit" element={<BlogPostForm />} />
                 <Route path="blog-posts/edit/:id" element={<BlogPostForm />} />
               </Route>
             </Routes>
