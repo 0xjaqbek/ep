@@ -1,30 +1,75 @@
-// src/components/Blog/BlogForm.tsx
-import React, { useState, useEffect } from 'react';
-import { Formik, Form, Field, FormikHelpers } from 'formik';
-import { useAuth } from '../../components/Auth/AuthProvider';
-import { BlogPostSchema, categories } from '../../validation/blogValidation';
-import { BlogFormProps, BlogFormValues, BlogPost } from '../../types/blog';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../../firebase/config';
+import { db, storage } from '../../firebase/config.ts';
 
-export const BlogForm: React.FC<BlogFormProps> = ({ 
-  initialPost = null, 
-  onSave, 
-  onCancel 
-}) => {
-  const { currentUser } = useAuth();
+// Validation Schema
+const BlogPostSchema = Yup.object().shape({
+  title: Yup.string()
+    .required('Title is required')
+    .min(5, 'Title must be at least 5 characters')
+    .max(100, 'Title must be less than 100 characters'),
+  content: Yup.string()
+    .required('Content is required')
+    .min(50, 'Content must be at least 50 characters'),
+  excerpt: Yup.string()
+    .required('Excerpt is required')
+    .max(300, 'Excerpt must be less than 300 characters'),
+  categories: Yup.array()
+    .of(Yup.string())
+    .min(1, 'Select at least one category'),
+  tags: Yup.array()
+    .of(Yup.string()),
+  seoTitle: Yup.string(),
+  seoDescription: Yup.string()
+});
+
+const CATEGORIES = [
+  'Medical Emergency',
+  'First Aid',
+  'Training',
+  'Tips',
+  'Education'
+];
+
+interface BlogFormProps {
+  initialPost?: {
+    id: string;
+    title: string;
+    content: string;
+    excerpt: string;
+    categories: string[];
+    tags: string[];
+    seoTitle?: string;
+    seoDescription?: string;
+    coverImage?: string;
+    publishedAt?: Date;
+    updatedAt?: Date;
+    author?: {
+      id: string;
+      name: string;
+      avatar: string;
+      bio: string;
+    };
+    seo?: {
+      title?: string;
+      description?: string;
+      keywords?: string[];
+    };
+  } | null;
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+const BlogForm: React.FC<BlogFormProps> = ({ initialPost, onSave, onCancel }) => {
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialPost?.coverImage || null
   );
-  const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [formSuccess, setFormSuccess] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log('BlogForm mounted', { currentUser });
-  }, [currentUser]);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -38,22 +83,13 @@ export const BlogForm: React.FC<BlogFormProps> = ({
     }
   };
 
-  const handleFormSubmit = async (values: BlogFormValues, { setSubmitting }: FormikHelpers<BlogFormValues>) => {
-    console.log('Form submission started', { values });
-    setLoading(true);
-    setFormError(null);
-    setFormSuccess(null);
+  const handleSubmit = async (values: any) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
-      if (!currentUser) {
-        throw new Error('Nie jesteś zalogowany');
-      }
-
-      if (currentUser.role !== 'admin') {
-        throw new Error('Nie masz uprawnień administratora');
-      }
-
       let coverImageUrl = initialPost?.coverImage || '';
+
       if (coverImageFile) {
         const imageRef = ref(storage, `blog_images/${Date.now()}_${coverImageFile.name}`);
         const snapshot = await uploadBytes(imageRef, coverImageFile);
@@ -70,12 +106,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({
         coverImage: coverImageUrl,
         publishedAt: initialPost?.publishedAt || new Date(),
         updatedAt: new Date(),
-        author: {
-          id: currentUser?.uid || '',
-          name: currentUser?.displayName || 'Administrator',
-          avatar: '',
-          bio: ''
-        },
         seo: {
           title: values.seoTitle || values.title,
           description: values.seoDescription || values.excerpt,
@@ -89,102 +119,86 @@ export const BlogForm: React.FC<BlogFormProps> = ({
         await addDoc(collection(db, 'blog_posts'), postData);
       }
 
-      setFormSuccess('Post saved successfully');
       onSave();
     } catch (error) {
-      console.error('Error saving post:', error);
-      setFormError(error instanceof Error ? error.message : 'Wystąpił błąd podczas zapisywania wpisu');
+      console.error('Error saving blog post:', error);
+      setSubmitError(error instanceof Error ? error.message : 'Error saving post');
     } finally {
-      setLoading(false);
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
-  const initialValues: BlogFormValues = {
-    title: initialPost?.title || '',
-    content: initialPost?.content || '',
-    excerpt: initialPost?.excerpt || '',
-    categories: initialPost?.categories || [],
-    tags: initialPost?.tags || [],
-    seoTitle: initialPost?.seo?.title || '',
-    seoDescription: initialPost?.seo?.description || '',
-    coverImage: null
-  };
-
   return (
-    <div className="bg-white shadow rounded-lg p-6 mb-8">
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6">
-        {initialPost ? 'Edytuj wpis na blogu' : 'Dodaj nowy wpis na blogu'}
+        {initialPost ? 'Edit Blog Post' : 'Create New Blog Post'}
       </h2>
 
-      {formError && (
+      {submitError && (
         <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
-          {formError}
-        </div>
-      )}
-
-      {formSuccess && (
-        <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg">
-          {formSuccess}
+          {submitError}
         </div>
       )}
 
       <Formik
-        initialValues={initialValues}
+        initialValues={{
+          title: initialPost?.title || '',
+          content: initialPost?.content || '',
+          excerpt: initialPost?.excerpt || '',
+          categories: initialPost?.categories || [],
+          tags: initialPost?.tags || [],
+          seoTitle: initialPost?.seoTitle || '',
+          seoDescription: initialPost?.seoDescription || ''
+        }}
         validationSchema={BlogPostSchema}
-        onSubmit={handleFormSubmit}
+        onSubmit={handleSubmit}
       >
-        {({ errors, touched, isSubmitting, values }) => (
+        {({ errors, touched, values, setFieldValue }) => (
           <Form className="space-y-6">
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">Debug Info:</p>
-              <p>User authenticated: {currentUser ? 'Yes' : 'No'}</p>
-              <p>User role: {currentUser?.role || 'Not set'}</p>
-              <p>Form errors: {Object.keys(errors).length > 0 ? JSON.stringify(errors) : 'None'}</p>
-              <p>Current values: {JSON.stringify(values)}</p>
-            </div>
-
             <div>
-              <label htmlFor="title" className="block mb-2">Tytuł</label>
+              <label className="block text-sm font-medium mb-1">Title</label>
               <Field
                 name="title"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Enter post title"
               />
               {touched.title && errors.title && (
-                <div className="text-red-500 text-sm mt-1">{errors.title}</div>
+                <div className="text-red-600 text-sm mt-1">{errors.title}</div>
               )}
             </div>
 
             <div>
-              <label htmlFor="content" className="block mb-2">Treść</label>
+              <label className="block text-sm font-medium mb-1">Content</label>
               <Field
                 name="content"
                 as="textarea"
                 rows={10}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Write your post content"
               />
               {touched.content && errors.content && (
-                <div className="text-red-500 text-sm mt-1">{errors.content}</div>
+                <div className="text-red-600 text-sm mt-1">{errors.content}</div>
               )}
             </div>
 
             <div>
-              <label htmlFor="excerpt" className="block mb-2">Krótki opis</label>
+              <label className="block text-sm font-medium mb-1">Excerpt</label>
               <Field
                 name="excerpt"
                 as="textarea"
                 rows={3}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-lg"
+                placeholder="Write a brief excerpt"
               />
               {touched.excerpt && errors.excerpt && (
-                <div className="text-red-500 text-sm mt-1">{errors.excerpt}</div>
+                <div className="text-red-600 text-sm mt-1">{errors.excerpt}</div>
               )}
             </div>
 
             <div>
-              <label className="block mb-2">Kategorie</label>
+              <label className="block text-sm font-medium mb-1">Categories</label>
               <div className="space-y-2">
-                {categories.map(category => (
+                {CATEGORIES.map(category => (
                   <label key={category} className="flex items-center">
                     <Field
                       type="checkbox"
@@ -197,90 +211,88 @@ export const BlogForm: React.FC<BlogFormProps> = ({
                 ))}
               </div>
               {touched.categories && errors.categories && (
-                <div className="text-red-500 text-sm mt-1">{errors.categories}</div>
+                <div className="text-red-600 text-sm mt-1">{errors.categories}</div>
               )}
             </div>
 
             <div>
-              <label htmlFor="tags" className="block mb-2">Tagi (oddziel przecinkami)</label>
+              <label className="block text-sm font-medium mb-1">Tags</label>
               <Field name="tags">
-                {({ field, form }: any) => (
+                {({ field }: any) => (
                   <input
                     type="text"
-                    placeholder="np. ratownictwo, pierwsza pomoc"
-                    value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Enter tags separated by commas"
+                    value={field.value.join(', ')}
                     onChange={(e) => {
                       const tags = e.target.value
                         .split(',')
                         .map(tag => tag.trim())
                         .filter(Boolean);
-                      form.setFieldValue('tags', tags);
+                      setFieldValue('tags', tags);
                     }}
-                    className="w-full p-2 border rounded"
                   />
                 )}
               </Field>
             </div>
 
             <div>
-              <label htmlFor="coverImage" className="block mb-2">Obrazek</label>
+              <label className="block text-sm font-medium mb-1">Cover Image</label>
               <input
                 type="file"
                 onChange={handleImageChange}
-                className="w-full p-2 border rounded"
                 accept="image/*"
+                className="w-full p-2 border rounded-lg"
               />
               {imagePreview && (
-                <img src={imagePreview} alt="Preview" className="mt-2 max-h-48" />
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="mt-2 max-h-48 rounded-lg"
+                />
               )}
             </div>
 
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-4">SEO</h3>
-              <div>
-                <label htmlFor="seoTitle" className="block mb-2">Tytuł SEO</label>
-                <Field
-                  name="seoTitle"
-                  className="w-full p-2 border rounded"
-                />
-              </div>
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-medium mb-4">SEO Settings</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">SEO Title</label>
+                  <Field
+                    name="seoTitle"
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Enter SEO title"
+                  />
+                </div>
 
-              <div className="mt-4">
-                <label htmlFor="seoDescription" className="block mb-2">Opis SEO</label>
-                <Field
-                  name="seoDescription"
-                  as="textarea"
-                  rows={2}
-                  className="w-full p-2 border rounded"
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-1">SEO Description</label>
+                  <Field
+                    name="seoDescription"
+                    as="textarea"
+                    rows={2}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Enter SEO description"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4 mt-6">
+            <div className="flex justify-end space-x-4 pt-6">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                disabled={isSubmitting || loading}
+                className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
+                disabled={isSubmitting}
               >
-                Anuluj
+                Cancel
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || loading}
-                className={`px-4 py-2 rounded text-white ${
-                  isSubmitting || loading
-                    ? 'bg-blue-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
               >
-                {loading || isSubmitting ? (
-                  <span>Zapisywanie...</span>
-                ) : initialPost ? (
-                  'Aktualizuj wpis'
-                ) : (
-                  'Dodaj wpis'
-                )}
+                {isSubmitting ? 'Saving...' : initialPost ? 'Update Post' : 'Create Post'}
               </button>
             </div>
           </Form>

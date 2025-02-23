@@ -1,9 +1,12 @@
 // src/components/LazyLoadedRoutes.tsx
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { LoadingSpinner } from '../components/Loading/LoadingSpinner.tsx';
 import { BlogPost } from '../types/blog.ts';
-import { BlogForm } from './BlogForm.tsx';
+import BlogForm from '../components/Blog/BlogForm.tsx';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase/config.ts';
+
 
 // Lazy load components
 const LandingPage = React.lazy(() => import('../components/LandingPage.tsx'));
@@ -44,12 +47,47 @@ const InvoiceManagement = React.lazy(() => import('../components/Admin/InvoiceMa
 const Settings = React.lazy(() => import('../components/Admin/Settings.tsx'));
 const DiscountManagement = React.lazy(() => import('../components/Admin/DiscountManagement.tsx'));
 const BlogPostManagement = React.lazy(() => import('../components/Admin/BlogPostManagement.tsx'));
-const BlogPostFormComponent = React.lazy(() => import('../components/Admin/BlogForm.tsx'));
+
 
 const BlogPostForm = React.lazy(() => {
   const Wrapper: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
+    const [post, setPost] = useState<BlogPost | null>(null);
+    const [loading, setLoading] = useState(!!id); // Only load if we have an ID
+
+    useEffect(() => {
+      const fetchPost = async () => {
+        if (!id) return;
+        
+        try {
+          const postRef = doc(db, 'blog_posts', id);
+          const postDoc = await getDoc(postRef);
+          
+          if (postDoc.exists()) {
+            const postData = {
+              id: postDoc.id,
+              ...postDoc.data(),
+              publishedAt: postDoc.data().publishedAt.toDate(),
+              updatedAt: postDoc.data().updatedAt?.toDate()
+            } as BlogPost;
+            
+            setPost(postData);
+          }
+        } catch (error) {
+          console.error('Error fetching blog post:', error);
+          navigate('/admin/blog-posts', { 
+            state: { error: 'Failed to load blog post' }
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (id) {
+        fetchPost();
+      }
+    }, [id, navigate]);
 
     const handleSave = () => {
       navigate('/admin/blog-posts');
@@ -59,19 +97,16 @@ const BlogPostForm = React.lazy(() => {
       navigate('/admin/blog-posts');
     };
 
-    // Use null if no id is present
-    const initialPost = id 
-      ? { id } as BlogPost 
-      : null;
+    if (loading) {
+      return <LoadingSpinner size="large" />;
+    }
 
     return (
-      <Suspense fallback={<LoadingSpinner size="large" />}>
-        <BlogPostFormComponent 
-          initialPost={initialPost} 
-          onSave={handleSave} 
-          onCancel={handleCancel} 
-        />
-      </Suspense>
+      <BlogForm 
+        initialPost={post}
+        onSave={handleSave}
+        onCancel={handleCancel}
+      />
     );
   };
 
