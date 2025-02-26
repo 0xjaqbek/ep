@@ -1,5 +1,4 @@
 // src/utils/certificateUtils.tsx
-import { jsPDF } from 'jspdf';
 import logoImage from '../assets/logoEP.webp';
 
 export interface CertificateData {
@@ -24,6 +23,7 @@ export const generateCertificateNumber = (courseId: string, userId: string) => {
 };
 
 export const generateAndDownloadPDF = async (data: CertificateData) => {
+  // Use dynamic import to load jsPDF only when needed
   const { jsPDF } = await import('jspdf');
   const pdfDoc = new jsPDF('landscape', 'mm', 'a4');
 

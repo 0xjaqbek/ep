@@ -4,12 +4,21 @@ import { LoadingSpinner } from '../components/Loading/LoadingSpinner.tsx';
 
 // Lazy load components
 const LandingPage = React.lazy(() => import('../components/LandingPage.tsx'));
-const About = React.lazy(() => import('../components/About.tsx'));
-const Contact = React.lazy(() => import('../components/Contact.tsx'));
+const About = React.lazy(() => 
+  import(/* webpackChunkName: "about" */ '../components/About.tsx')
+);
+
+const Contact = React.lazy(() => 
+  import(/* webpackChunkName: "contact" */ '../components/Contact.tsx')
+);
 const Regulations = React.lazy(() => import('../components/Regulations.tsx'));
 const Login = React.lazy(() => import('../components/Auth/Login.tsx'));
 const Register = React.lazy(() => import('../components/Auth/Register.tsx'));
-const UserAccount = React.lazy(() => import('../components/User/UserAccount.tsx'));
+const UserAccount = React.lazy(() => 
+  import('../components/User/UserAccount.tsx').then(module => ({
+    default: module.UserAccount
+  }))
+);
 const ReferralDashboard = React.lazy(() => import('../components/Referrals/ReferralDashboard.tsx'));
 const CourseView = React.lazy(() => import('../components/Courses/CourseView.tsx'));
 const CourseList = React.lazy(() => import('../components/Courses/CourseList.tsx'));
@@ -25,7 +34,11 @@ const FAQ = React.lazy(() => import('../components/FAQ.tsx'));
 const ResetPassword = React.lazy(() => import('../components/ResetPassword.tsx'));
 
 // Admin components
-const AdminLayout = React.lazy(() => import('../components/Admin/AdminLayout.tsx'));
+const AdminLayout = React.lazy(() => 
+  import('../components/Admin/AdminLayout.tsx').then(module => ({
+    default: module.default
+  }))
+);
 const AnalyticsDashboard = React.lazy(() => import('../components/Admin/AnalyticsDashboard.tsx'));
 const PaymentManagement = React.lazy(() => import('../components/Admin/PaymentManagement.tsx'));
 const CertificateManagement = React.lazy(() => import('../components/Admin/CertificateManagement.tsx'));
