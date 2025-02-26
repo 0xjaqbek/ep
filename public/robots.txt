@@ -1,9 +1,25 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt for Progres999.pl
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /account/
-Disallow: /payment/
 Disallow: /checkout/
+Disallow: /payment/
+Disallow: /reset-password
 
+# Don't index this content
+Disallow: /*?ref=*
+
+# Prevent crawling of duplicate content
+Disallow: /login/
+Disallow: /register/
+
+# Crawl-delay for specific bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: Baiduspider
+Crawl-delay: 10
+
+# Sitemap locations
 Sitemap: https://progres999.pl/sitemap.xml

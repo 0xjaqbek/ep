@@ -104,9 +104,9 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div className="max-w-4xl mx-auto mb-12 space-y-4 text-base md:text-lg">
-              <p className="text-white/90 leading-relaxed">
-                Witamy na platformie edukacyjnej dla ratowników medycznych, oferującej specjalistyczne kursy internetowe z zakresu ratownictwa medycznego, umożliwiające uzyskanie punktów edukacyjnych.
-              </p>
+              <h1 className="text-white/90 leading-relaxed">
+                Witamy na platformie edukacyjnej dla ratowników medycznych, oferującej kursy internetowe z zakresu ratownictwa medycznego, umożliwiające uzyskanie punktów edukacyjnych.
+              </h1>
               <p className="text-white/90 leading-relaxed">
                 Nasze kursy są prowadzone przez wykwalifikowaną kadrę dydaktyczną, zapewniając najwyższy poziom kształcenia w dziedzinie ratownictw medycznego.
               </p>
