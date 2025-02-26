@@ -78,9 +78,11 @@ const CourseView: React.FC = () => {
     return (
       <>
       <SEO 
-        title="Kursy"
-        description="Przeglądaj nasze kursy medyczne. Zdobywaj wiedzę i punkty edukacyjne online."
-        ogType="website"
+        title={`${course.title} | Progres999`}
+        description={`Zdobądź certyfikat z ${course.title}. Kurs online dla ratowników medycznych. ${course.points} punktów edukacyjnych.`}
+        keywords={`${course.title}, ratownictwo medyczne, punkty edukacyjne, certyfikat`}
+        ogType="article"
+        ogImage={course.thumbnail || '/logo.png'}
       />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">{course.title}</h1>

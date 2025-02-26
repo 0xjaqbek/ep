@@ -6,8 +6,11 @@ const Regulations: React.FC = () => {
   return (
     <>
       <SEO 
-        title="Regulamin"
-        description="Regulamin serwisu Progres999 - platformy edukacyjnej dla ratowników medycznych."
+        title="Regulamin | Progres999"
+        description="Szczegółowy regulamin platformy edukacyjnej Progres999 dla ratowników medycznych. Zapoznaj się z zasadami korzystania z naszych kursów online."
+        keywords="regulamin, kursy online, ratownictwo medyczne, zasady platformy, warunki korzystania"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Regulamin serwisu Progres999</h1>
@@ -15,7 +18,7 @@ const Regulations: React.FC = () => {
           Ostatnia aktualizacja: 02.02.2024
         </div>
         
-        {/* Spis treści */}
+        {/* Remaining content stays the same */}
         <nav className="mb-8 p-4 bg-gray-50 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Spis treści:</h2>
           <ul className="space-y-2">

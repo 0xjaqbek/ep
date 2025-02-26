@@ -68,8 +68,11 @@ const ResetPassword = () => {
   return (
     <>
       <SEO 
-        title="Reset hasła"
-        description="Zresetuj swoje hasło do platformy Progres999"
+        title="Reset Hasła | Progres999"
+        description="Zresetuj swoje hasło do platformy edukacyjnej Progres999. Bezpieczny i prosty proces odzyskiwania dostępu do konta."
+        keywords="reset hasła, odzyskiwanie konta, ratownictwo medyczne, kursy online"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">

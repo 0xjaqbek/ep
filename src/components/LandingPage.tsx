@@ -57,8 +57,11 @@ const LandingPage: React.FC = () => {
   return (
     <>
       <SEO 
-        title="Strona Główna"
-        description="Platforma edukacyjna dla Ratowników Medycznych. Twoja wiedza, ich życie – rozwijaj się z nami."
+        title="Strona Główna | Progres999"
+        description="Platforma edukacyjna dla Ratowników Medycznych. Zdobywaj punkty edukacyjne, certyfikaty i rozwijaj swoje umiejętności ratownicze online."
+        keywords="ratownictwo medyczne, kursy online, punkty edukacyjne, certyfikaty, szkolenia medyczne"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="relative min-h-screen overflow-hidden">
         <div 

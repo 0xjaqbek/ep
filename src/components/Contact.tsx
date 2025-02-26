@@ -61,8 +61,11 @@ const Contact = () => {
   return (
     <>
       <SEO 
-        title="Kontakt"
-        description="Skontaktuj się z nami. Jesteśmy tu, aby pomóc w Twoim rozwoju zawodowym."
+        title="Kontakt | Progres999"
+        description="Skontaktuj się z nami. Jesteśmy tu, aby pomóc w Twoim rozwoju zawodowym. Masz pytania? Napisz do nas!"
+        keywords="kontakt, ratownictwo medyczne, pomoc, wsparcie, formularz kontaktowy"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Kontakt</h1>
@@ -72,7 +75,7 @@ const Contact = () => {
             <h2 className="text-xl font-semibold mb-4">Dane kontaktowe</h2>
             <div className="space-y-2">
               <p><strong>Adres:</strong> ul. Przykładowa 1/2, 00-001 Warszawa</p>
-              <p><strong>Email:</strong> kontakt@progres999.pl</p>
+              <p><strong>Email:</strong> jaqbek.eth@gmail.com</p>
               <p><strong>Telefon:</strong> +48 000 000 000</p>
               <p><strong>Godziny pracy:</strong> Pon-Pt 9:00-17:00</p>
             </div>

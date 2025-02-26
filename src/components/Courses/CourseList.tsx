@@ -253,9 +253,11 @@ export const CourseList: React.FC = () => {
   return (
     <>
       <SEO 
-        title="Kursy"
-        description="Przeglądaj kursy z ratownictwa medycznego. Ucz się online, zdobywaj punkty edukacyjne i certyfikaty."
-        keywords="kursy medyczne, ratownictwo medyczne, punkty edukacyjne, certyfikaty"
+        title="Kursy Medyczne | Progres999"
+        description="Przeglądaj profesjonalne kursy z ratownictwa medycznego. Ucz się online, zdobywaj punkty edukacyjne i certyfikaty. Rozwijaj swoje umiejętności z najlepszymi ekspertami."
+        keywords="kursy medyczne, ratownictwo medyczne, punkty edukacyjne, certyfikaty, szkolenia online"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="container mx-auto px-4 py-8">
         {/* Courses Section */}

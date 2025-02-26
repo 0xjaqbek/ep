@@ -95,8 +95,11 @@ const FAQ: React.FC = () => {
   return (
     <>
       <SEO 
-        title="Często Zadawane Pytania (FAQ)"
-        description="Odpowiedzi na najczęściej zadawane pytania dotyczące kursów ratownictwa medycznego, płatności, certyfikatów i konta użytkownika."
+        title="Często Zadawane Pytania (FAQ) | Progres999"
+        description="Kompleksowe odpowiedzi na najczęściej zadawane pytania dotyczące kursów ratownictwa medycznego, płatności, certyfikatów i konta użytkownika. Dowiedz się wszystkiego o naszej platformie edukacyjnej."
+        keywords="FAQ, ratownictwo medyczne, kursy online, płatności, certyfikaty, konto użytkownika"
+        ogType="website"
+        ogImage="/logo.png"
       />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8 text-center">Często Zadawane Pytania</h1>
